@@ -20,7 +20,6 @@ end
 
 if a == b && b == c 
   puts "Треугольник равносторонний"
-
 else
   is_simple = true
   
@@ -39,5 +38,4 @@ else
   if is_simple 
     puts "Обычный треугольник"
   end
-
 end

@@ -13,13 +13,12 @@ c = gets.chomp.to_i
 d = b**2 - 4*a*c
 
 if d < 0
-  puts "Действительных корней нет!"
-else
-  sqrt_d = Math.sqrt(d)
-  x1 = (-b + sqrt_d) / (2*a)
-  x2 = (-b - sqrt_d) / (2*a)
-
-  print "D = #{d}, x1 = #{x1}"
-  print ", x2 = #{x2}" if d > 0
-  puts
+  puts "D = #{d}. Действительных корней нет!"
+elsif d == 0
+  x1 = (-b / (2*a)
+  puts "D = #{d}, x1 = #{x1}"
+else    
+  x1 = (-b + Math.sqrt(d)) / (2*a)
+  x2 = (-b - Math.sqrt(d)) / (2*a)
+  puts "D = #{d}, x1 = #{x1}, x2 = #{x2}"
 end
