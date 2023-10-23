@@ -1,5 +1,5 @@
 #Thinknetica Ruby on Rails
-#Part 1. Задание 1. Идеальный вес.
+#Part 2. Задание 1. Идеальный вес.
 #(c)2023 Anton Kokarev
 
 puts "Вычисление идеального веса"
