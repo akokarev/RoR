@@ -5,6 +5,10 @@
 volwes_chars = "aeoui".chars
 volwes_hash = {}
 
-puts volwes_chars
+abc = ('a'..'z').to_a
 
-#('a'..'z').to_a.each ()
+abc.each_with_index do |letter, index|
+    volwes_hash [ letter.to_sym ] = index+1 if volwes_chars.include? letter
+end
+
+puts volwes_hash
