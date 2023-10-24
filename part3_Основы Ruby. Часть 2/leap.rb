@@ -6,7 +6,8 @@ print "Укажите дату (ДД.ММ.ГГГГ):"
 dd,mm,year = gets.chomp.split('.').map(&:to_i)
 
 is_leap = (year % 400 == 0) || ( year % 4 == 0 && year % 100 != 0 )
-months = [31, (is_leap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+fedruary_days = is_leap ? 29 : 28
+months = [31, fedruary_days, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 pos = dd
 index=0
