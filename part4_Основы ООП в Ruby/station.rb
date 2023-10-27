@@ -1,5 +1,8 @@
-class Station
+require './protect_station.rb'
+class Station < Protect_station
   attr_reader :name, :trains
+  undef :station
+  undef_method :station=
 
   def initialize(name)
     @name = name
@@ -12,7 +15,7 @@ class Station
   end
 
   def depart(train)
-    @trains.delete(train)
+    trains.delete(train)
   end
 
   def by_type(type)

@@ -1,6 +1,6 @@
-class Train
+require './protect_station.rb'
+class Train < Protect_station
   attr_reader :number, :type, :van_count, :speed, :route
-  attr_accessor :station
 
   def initialize(number, type, van_count)
     @number = number
@@ -10,29 +10,29 @@ class Train
   end
 
   def accelerate(delta_speed)
-    speed += delta_speed if delta_speed > 0
+    @speed += delta_speed if delta_speed > 0
   end
 
   def slow(delta_speed)
-    speed -= delta_speed if delta_speed > 0
+    @speed -= delta_speed if delta_speed > 0
     stop if @speed < 0
   end
 
   def stop
-    speed = 0
+    @speed = 0
   end
 
   def hook_van
-    van_count += 1 if speed == 0
+    @van_count += 1 if speed == 0
   end
 
   def unhook_van
-    van_count -= 1 if speed == 0 && van_count > 0
+    @van_count -= 1 if speed == 0 && van_count > 0
   end
 
   def set_route(route)
     @route = route
-    station.depart(self) if @station
+    station.depart(self) if station
     station = route.stations.first
     station.arrive(self)
   end
