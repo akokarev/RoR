@@ -1,116 +1,67 @@
-class Station
-  attr_reader :name, :trains
+require './Station.rb'
+require './Route.rb'
+require './Train.rb'
 
-  def initialize(name)
-    @name = name
-    @trains = []
-  end
+def list_trains_at(station)
+  puts "На станции #{station.name}" if station.trains.count > 0
+  station.trains.each{|train| puts "Поезд №#{train.number}, #{train.type}, #{train.van_count}"+(train.route ? " #{train.route.stations.first.name} - #{train.route.stations.last.name}" : "")}
+end
 
-  def arrive(train)
-    @trains << train
-    train.set_station(self)
-  end
-
-  def depart(train)
-    @trains.delete(train)
-  end
-
-  def by_type(type)
-    trains.select {|t| t.type == type}
-  end
-
-  def list
-    puts "Поезда на станции #{@name}"
-    trains.each {|t| puts " №#{t.number} #{t.type} =#{t.van_count}"}
-  end
-end #class Station
+def list_trains_at_all(stations)
+  stations.each{|key, station| list_trains_at(station)}  
+end
 
 
-class Route
-  attr_reader :stations
-
-  def initialize(first, last)
-    @stations = [first, last]
-  end
-
-  def add(pos = -2, station)
-    @stations.insert(pos, station)
-  end
-
-  def remove(station)
-    @stations.delete(station)
-  end
-
-  def print
-    @stations.each {|s| puts s.name}
-  end
-end #class Route
+stations = {}
+stations[:MSK] =  Station.new('Москва')
+stations[:SPB] = Station.new('Санкт-Питербург')
+stations[:RND] = Station.new('Ростов-на-Дону')
+stations[:KRD] = Station.new('Краснодар')
+stations[:SCH] = Station.new('Сочи')
+stations[:ADL] = Station.new('Адлер')
 
 
-class Train
-  $TRAIN_TYPES=[:passanger, :cargo]
-  attr_reader :number, :type, :van_count, :speed, :route, :station
+route101 = Route.new(stations[:MSK],stations[:ADL])
+route101.add(stations[:RND])
+route101.add(stations[:KRD])
+route101.add(stations[:SCH])
 
-  def initialize(number,type,van_count)
-    @number = number
-    @type = type
-    @van_count = van_count
-    @speed = 0
-  end
+route102 = Route.new(stations[:ADL],stations[:MSK])
+route102.add(stations[:SCH])
+route102.add(stations[:KRD])
+route102.add(stations[:RND])
 
-  def accelerate(delta_v)
-    @speed += delta_v if delta_v > 0
-  end
 
-  def slow(delta_v)
-    @speed -= delta_v if delta_v > 0
-    stop if @speed < 0
-  end
+route107 = Route.new(stations[:SPB],stations[:KRD])
+route107.add(stations[:RND])
 
-  def stop
-    @speed = 0
-  end
+route108 = Route.new(stations[:KRD],stations[:SPB])
+route108.add(stations[:RND])
 
-  def hook_van
-    @van_count += 1 if @speed == 0
-  end
 
-  def unhook_van
-    @van_count -= 1 if @speed == 0 && @van_count > 0
-  end
+train8001 = Train.new(8001,:passanger,10)
+train8002 = Train.new(8002,:passanger,10)
+train911 = Train.new(911,:cargo,1)
+train112 = Train.new(112,:cargo,2)
 
-  def set_route(route)
-    @route = route
-    @station.depart(self) if @station
-    @station = route.stations.first
-    @station.arrive(self)
-  end
 
-  def move_up
-    if @route && @station != @route.stations.last
-      @station.depart(self)
-      @station = next_station
-      @station.arrive(self)
-    end
-  end
+train8001.set_route(route101)
+puts "#{train8001}"
 
-  def move_down
-    if @route && @station != @route.stations.first
-      @station.depart(self)
-      @station = prev_station
-      @station.arrive(self)
-    end
-  end
+train8002.set_route(route102)
+stations[:MSK].arrive(train911)
+stations[:SPB].arrive(train112)
 
-  def next_station
-    @route.stations[@route.stations.index(@station)+1]
-  end    
 
-  def prev_station
-    @route.stations[@route.stations.index(@station)-1]
-  end
+list_trains_at_all(stations)
 
-  def set_station (station)
-    @station = station
-  end
-end #class Train
+puts "\n=Поезд 8001 отправился"
+train8001.move_up
+
+list_trains_at_all(stations)
+
+puts "\n=Поезд 8001 отправился"
+train8001.move_up
+
+list_trains_at_all(stations)
+
