@@ -1,11 +1,13 @@
 require_relative 'train.rb'
 class Van
   attr_reader :number, :type, :train
-  private attr_writer :number, :type, :train
 
-  def initialize(number, type)
+  def type 
+    raise NotImplementedError
+  end
+
+  def initialize(number)
     @number = number
-    @type = type
     @train = nil
   end
 
@@ -25,4 +27,8 @@ class Van
     train = nil
     old_train.unhook(self) if old_train.vans.include?(self)
   end
+
+private
+  attr_writer :number, :type, :train
+
 end

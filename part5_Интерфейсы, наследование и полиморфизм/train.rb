@@ -1,11 +1,12 @@
 class Train
-  attr_reader :number, :type, :vans, :speed, :route, :station
-  
-  private attr_writer :speed, :station, :vans
+  attr_reader :number, :vans, :speed, :route, :station
 
-  def initialize(number, type)
+  def type 
+    raise NotImplementedError
+  end
+
+  def initialize(number)
     @number = number
-    @type = type
     @vans = []
     @speed = 0
   end
@@ -17,6 +18,7 @@ class Train
       old_station.depart(self) if old_station
       new_station.arrive(self) if new_station
     end
+    return @station
   end
 
   def accelerate(delta_speed)
@@ -44,6 +46,7 @@ class Train
 
     vans << van
     van.hook(self) unless van.train == self
+    return self
   end
 
   def unhook(van)
@@ -51,6 +54,7 @@ class Train
     raise 'Нельзя отцепить вагон во время движения поезда' unless self.speed == 0
     vans.delete(van)
     van.unhook unless van.train == self
+    return self
   end
 
   def set_route(route)
@@ -81,4 +85,8 @@ class Train
   def current_station
     @station
   end
+
+private 
+  attr_writer :speed, :station, :vans
+
 end

@@ -1,8 +1,6 @@
 class Station
   attr_reader :name, :trains
 
-  private attr_writer :trains
-
   def initialize(name)
     @name = name
     @trains = []
@@ -25,4 +23,8 @@ class Station
   def list_trains
     trains
   end
+
+private 
+  attr_writer :trains
+
 end
