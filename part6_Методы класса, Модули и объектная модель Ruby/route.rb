@@ -13,8 +13,4 @@ class Route
     stations.delete(station)
   end
 
-  def to_s
-     "[#{stations.join '-'}]"
-  end
-
 end

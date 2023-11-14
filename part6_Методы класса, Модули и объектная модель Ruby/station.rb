@@ -20,8 +20,8 @@ class Station
     trains.select {|t| t.type == type}
   end
 
-  def to_s
-    @name
+  def list_trains
+    trains
   end
 
 private 

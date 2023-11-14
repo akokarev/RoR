@@ -1,11 +1,11 @@
 require_relative 'station.rb'
 require_relative 'route.rb'
-require_relative 'train.rb'
-require_relative 'van.rb'
-require_relative 'cargo_train.rb'
-require_relative 'cargo_van.rb'
-require_relative 'passenger_train.rb'
-require_relative 'passenger_van.rb'
+require_relative 'trains/train.rb'
+require_relative 'trains/cargo_train.rb'
+require_relative 'trains/passenger_train.rb'
+require_relative 'vans/van.rb'
+require_relative 'vans/cargo_van.rb'
+require_relative 'vans/passenger_van.rb'
 
 class MainCLI
   attr_accessor :stations, :trains, :vans, :routes
@@ -32,48 +32,25 @@ class MainCLI
     ask(question, default_answer).to_i
   end
 
-  #Цветной вывод https://stackoverflow.com/questions/1489183/how-can-i-use-ruby-to-colorize-the-text-output-to-a-terminal
-  COLORS = {:default => "38", :black => "30", :red => "31", :green => "32", :brown => "33", :blue => "34", :purple => "35",
-    :cyan => "36", :gray => "37", :dark_gray => "1;30", :light_red => "1;31", :light_green => "1;32", :yellow => "1;33",
-    :light_blue => "1;34", :light_purple => "1;35", :light_cyan => "1;36", :white => "1;37"}
-  BG_COLORS = {:default => "0", :black => "40", :red => "41", :green => "42", :brown => "43", :blue => "44",
-    :purple => "45", :cyan => "46", :gray => "47", :dark_gray => "100", :light_red => "101", :light_green => "102",
-    :yellow => "103", :light_blue => "104", :light_purple => "105", :light_cyan => "106", :white => "107"}
-
-  def colorize(text, color = :default, bgColor = :default)
-    color_code = COLORS[color]
-    bgColor_code = BG_COLORS[bgColor]
-    "\033[#{bgColor_code};#{color_code}m#{text}\033[0m"
+  def colorize(text, color = "default", bgColor = "default") #https://stackoverflow.com/questions/1489183/how-can-i-use-ruby-to-colorize-the-text-output-to-a-terminal
+      colors = {"default" => "38","black" => "30","red" => "31","green" => "32","brown" => "33", "blue" => "34", "purple" => "35",
+       "cyan" => "36", "gray" => "37", "dark gray" => "1;30", "light red" => "1;31", "light green" => "1;32", "yellow" => "1;33",
+        "light blue" => "1;34", "light purple" => "1;35", "light cyan" => "1;36", "white" => "1;37"}
+      bgColors = {"default" => "0", "black" => "40", "red" => "41", "green" => "42", "brown" => "43", "blue" => "44",
+       "purple" => "45", "cyan" => "46", "gray" => "47", "dark gray" => "100", "light red" => "101", "light green" => "102",
+       "yellow" => "103", "light blue" => "104", "light purple" => "105", "light cyan" => "106", "white" => "107"}
+      color_code = colors[color]
+      bgColor_code = bgColors[bgColor]
+      return "\033[#{bgColor_code};#{color_code}m#{text}\033[0m"
   end
 
-  def col_command(str)
-    colorize(str, :green)
-  end
-
-  def col_param(str)
-    colorize(str, :light_red)
-  end
-  
-  def col_title(str)
-    colorize(str, :cyan)
-  end
-  
-  def col_subtitle(str)
-    colorize(str, :default, :dark_gray)
-  end
-
-  def col_count(str)
-    colorize(str, :purple)
-  end
-  
-  def col_comment(str)
-    colorize(str, :default)
-  end
-  
-  def col_error(str)
-      colorize(str, :red)
-  end
-
+  def col_command(str)  colorize(str, 'green') end
+  def col_param(str)    colorize(str, 'light red') end
+  def col_title(str)    colorize(str, 'cyan') end
+  def col_subtitle(str) colorize(str, 'default', 'dark gray') end
+  def col_count(str)    colorize(str, 'purple') end
+  def col_comment(str)  colorize(str, '') end
+  def col_error(str)    colorize(str, 'red') end
 
   #ACTIONS
   def show_help 
@@ -115,7 +92,7 @@ class MainCLI
     when :cargo then trains << CargoTrain.new(number.to_i)
     when :passenger then trains << PassengerTrain.new(number.to_i)
     end
-    puts "\##{trains.count-1}: #{trains.last}"
+    puts "\##{trains.count-1}: #{trains.last.inspect}"
   end
 
   def new_van(number, type)
@@ -134,7 +111,7 @@ class MainCLI
       stations_names[1..-2].each {|st_name| route.add(stations.select{|st| st.name == st_name}) }   
     end
     routes << route
-    puts "\##{routes.count-1}: #{routes.last}"    
+    puts "\##{routes.count-1}: #{routes.last.inspect}"    
   end
 
   def show_station(name)
@@ -159,8 +136,7 @@ class MainCLI
       station_name=choice_arr.join(' ')
       stations << Station.new(station_name)
       puts "\##{stations.count-1}: #{stations.last.inspect}"
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -169,11 +145,9 @@ class MainCLI
       case choice_arr.first.upcase
       when 'C','CARGO'      then new_train(choice_arr[1], :cargo)
       when 'P', 'PASSENGER' then new_train(choice_arr[1], :passenger)
-      else
-        puts ERROR_WRONG_COMMAND
+      else puts ERROR_WRONG_COMMAND
       end
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -182,19 +156,16 @@ class MainCLI
       case choice_arr.first.upcase
       when 'C','CARGO'      then new_van(choice_arr[1], :cargo)
       when 'P', 'PASSENGER' then new_van(choice_arr[1], :passenger)
-      else
-        puts ERROR_WRONG_COMMAND
+      else puts ERROR_WRONG_COMMAND
       end
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
   def menu_new_route(choice_arr)
     if choice_arr.count >=1
       new_route(choice_arr.join(' ').split(';'))
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -205,8 +176,7 @@ class MainCLI
     when 'T', 'TRAIN'   then menu_new_train(choice_arr)
     when 'V', 'VAN'     then menu_new_van(choice_arr)
     when 'R', 'ROUTE'   then menu_new_route(choice_arr)
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end 
   end
 
@@ -217,8 +187,7 @@ class MainCLI
     when 'T', 'TRAIN'   then show_train(choice_arr.first.to_i)
     when 'V', 'VAN'     then show_van(choice_arr.first.to_i)
     when 'R', 'ROUTE'   then puts routes[(choice_arr.first.to_i)].inspect
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -228,8 +197,7 @@ class MainCLI
     when 'T', 'TRAINS'    then trains.each { |tr| puts tr.inspect} 
     when 'V', 'VANS'      then vans.each { |vn| puts vn.inspect }
     when 'R', 'ROUTES'    then routes.each_with_index { |rt, n| puts "#{n}#{rt.inspect}" }
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -240,23 +208,20 @@ class MainCLI
     when 'T', 'TRAIN'   then puts trains.delete(trains.select { |tr| tr.number==choice_arr.first.to_i}.first).inspect
     when 'V', 'VAN'     then puts vans.delete(vans.select { |vn| vn.number==choice_arr.first.to_i}.first).inspect
     when 'R', 'ROUTE'   then puts routes.delete(routes[choice_arr.first.to_i]).inspect
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
   def menu_train_hook(train, choice_arr)
     number = choice_arr.first.to_i
     van = vans.select { |vn| vn.number == number }.first
-    train.hook(van)
-    puts "Вагон успешно прицеплен"
+    puts train.hook(van).inspect
   end
 
   def menu_train_unhook(train, choice_arr)
     number = choice_arr.first.to_i
     van = vans.select { |vn| vn.number == number }.first
-    train.unhook(van)
-    puts "Вагон успешно отцеплен"
+    puts train.unhook(van).inspect
   end
 
   def menu_train_move(train, choice_arr)
@@ -265,15 +230,14 @@ class MainCLI
     case direction
     when 'U', 'UP'   then puts train.move_up.inspect
     when 'D', 'DOWN' then puts train.move_down.inspect
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
   def menu_train_route(train, choice_arr)
     n = choice_arr.first.to_i
     train.set_route(routes[n])
-    puts "Поезду назначен на маршрут"
+    puts train.inspect
   end
 
   def menu_train(choice_arr)
@@ -285,8 +249,7 @@ class MainCLI
     when 'U', 'UNHOOK'  then menu_train_unhook(train, choice_arr)
     when 'M', 'MOVE'    then menu_train_move(train, choice_arr)
     when 'R', 'ROUTE'   then menu_train_route(train, choice_arr)
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end  
 
@@ -302,8 +265,7 @@ class MainCLI
     choice_current = choice_arr.shift.upcase
     case choice_current
     when 'A', 'ADD'    then puts menu_route_add(route, choice_arr.join(' ')).inspect
-    else
-      puts ERROR_WRONG_COMMAND
+    else puts ERROR_WRONG_COMMAND
     end
   end
 
@@ -328,8 +290,7 @@ class MainCLI
           when 'D', 'DELETE'  then menu_delete(choice_arr)
           when 'T', 'TRAIN'   then menu_train(choice_arr)
           when 'R', 'ROUTE'   then menu_route(choice_arr)
-          else
-            puts ERROR_WRONG_COMMAND
+          else puts ERROR_WRONG_COMMAND
           end
         end
       end

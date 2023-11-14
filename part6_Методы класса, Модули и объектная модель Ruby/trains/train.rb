@@ -1,4 +1,7 @@
+require_relative '../manufacturer.rb'
+
 class Train
+  include Manufacturer
   attr_reader :number, :vans, :speed, :route, :station
 
   def type 
@@ -18,7 +21,7 @@ class Train
       old_station.depart(self) if old_station
       new_station.arrive(self) if new_station
     end
-    @station
+    return @station
   end
 
   def accelerate(delta_speed)
@@ -34,6 +37,10 @@ class Train
     @speed = 0
   end
 
+  def van_count
+    vans.count
+  end
+
   def hook(van)
     raise 'Вагон должен быть указан' unless van.kind_of? Van
     raise 'Тип поезда не соответсвует типу вагона' unless self.type == van.type  
@@ -42,6 +49,7 @@ class Train
 
     vans << van
     van.hook(self) unless van.train == self
+    return self
   end
 
   def unhook(van)
@@ -49,6 +57,7 @@ class Train
     raise 'Нельзя отцепить вагон во время движения поезда' unless self.speed == 0
     vans.delete(van)
     van.unhook unless van.train == self
+    return self
   end
 
   def set_route(route)
@@ -80,11 +89,7 @@ class Train
     @station
   end
 
-  def to_s
-    "Поезд \##{number} (#{type}): скорость #{speed}км/ч, вагонов #{vans.count}, станция #{station}, маршрут #{route}"
-  end
-
-  private 
+private 
   attr_writer :speed, :station, :vans
 
 end
