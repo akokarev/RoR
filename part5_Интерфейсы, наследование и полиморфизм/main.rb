@@ -123,7 +123,7 @@ class MainCLI
     when :cargo then vans << CargoVan.new(number.to_i)
     when :passenger then vans << PassengerVan.new(number.to_i)
     end
-    puts "\##{vans.count-1}: #{vans.last.inspect}"
+    puts "\##{vans.count-1}: #{vans.last}"
   end
 
   def new_route(stations_names)
@@ -139,17 +139,19 @@ class MainCLI
 
   def show_station(name)
     station = stations.select{|st| st.name==name}.first
-    puts "#{station.inspect}"
+    puts "=#{station}="
+    station.trains.each { |train| puts train}
   end
 
   def show_train(number)
     train = trains.select{|tr| tr.number==number}.first
-    puts "#{train.inspect}"
+    puts "=#{train}="
+    train.vans.each { |van| puts van }
   end
 
   def show_van(number)
     van = vans.select{|vn| vn.number==number}.first
-    puts "#{van.inspect}"
+    puts "#{van}"
   end
 
 
@@ -158,7 +160,7 @@ class MainCLI
     if choice_arr.count >= 1
       station_name=choice_arr.join(' ')
       stations << Station.new(station_name)
-      puts "\##{stations.count-1}: #{stations.last.inspect}"
+      puts "\##{stations.count-1}: #{stations.last}"
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -167,8 +169,10 @@ class MainCLI
   def menu_new_train(choice_arr)
     if choice_arr.count == 2
       case choice_arr.first.upcase
-      when 'C','CARGO'      then new_train(choice_arr[1], :cargo)
-      when 'P', 'PASSENGER' then new_train(choice_arr[1], :passenger)
+      when 'C','CARGO'
+        new_train(choice_arr[1], :cargo)
+      when 'P', 'PASSENGER' 
+        new_train(choice_arr[1], :passenger)
       else
         puts ERROR_WRONG_COMMAND
       end
@@ -180,8 +184,10 @@ class MainCLI
   def menu_new_van(choice_arr)
     if choice_arr.count == 2
       case choice_arr.first.upcase
-      when 'C','CARGO'      then new_van(choice_arr[1], :cargo)
-      when 'P', 'PASSENGER' then new_van(choice_arr[1], :passenger)
+      when 'C','CARGO'
+        new_van(choice_arr[1], :cargo)
+      when 'P', 'PASSENGER'
+        new_van(choice_arr[1], :passenger)
       else
         puts ERROR_WRONG_COMMAND
       end
@@ -201,10 +207,14 @@ class MainCLI
   def menu_new(choice_arr)
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'S', 'STATION' then menu_new_station(choice_arr)
-    when 'T', 'TRAIN'   then menu_new_train(choice_arr)
-    when 'V', 'VAN'     then menu_new_van(choice_arr)
-    when 'R', 'ROUTE'   then menu_new_route(choice_arr)
+    when 'S', 'STATION'
+     menu_new_station(choice_arr)
+    when 'T', 'TRAIN'
+      menu_new_train(choice_arr)
+    when 'V', 'VAN'
+      menu_new_van(choice_arr)
+    when 'R', 'ROUTE'
+      menu_new_route(choice_arr)
     else
       puts ERROR_WRONG_COMMAND
     end 
@@ -213,10 +223,14 @@ class MainCLI
   def menu_show(choice_arr)
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'S', 'STATION' then show_station(choice_arr.join(' '))
-    when 'T', 'TRAIN'   then show_train(choice_arr.first.to_i)
-    when 'V', 'VAN'     then show_van(choice_arr.first.to_i)
-    when 'R', 'ROUTE'   then puts routes[(choice_arr.first.to_i)].inspect
+    when 'S', 'STATION'
+      show_station(choice_arr.join(' '))
+    when 'T', 'TRAIN'
+      show_train(choice_arr.first.to_i)
+    when 'V', 'VAN'
+      show_van(choice_arr.first.to_i)
+    when 'R', 'ROUTE'
+      puts routes[(choice_arr.first.to_i)]
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -224,10 +238,10 @@ class MainCLI
 
   def menu_list(choice_arr)
     case choice_arr.first.upcase
-    when 'S', 'STATIONS'  then stations.each { |st| puts st.inspect}
-    when 'T', 'TRAINS'    then trains.each { |tr| puts tr.inspect} 
-    when 'V', 'VANS'      then vans.each { |vn| puts vn.inspect }
-    when 'R', 'ROUTES'    then routes.each_with_index { |rt, n| puts "#{n}#{rt.inspect}" }
+    when 'S', 'STATIONS'  then stations.each { |st| puts st}
+    when 'T', 'TRAINS'    then trains.each { |tr| puts tr} 
+    when 'V', 'VANS'      then vans.each { |vn| puts vn}
+    when 'R', 'ROUTES'    then routes.each_with_index { |rt, n| puts "#{n} #{rt}" }
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -236,10 +250,29 @@ class MainCLI
   def menu_delete(choice_arr)
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'S', 'STATION' then puts stations.delete(stations.select { |st| st.name==choice_arr.join(' ')}.first).inspect
-    when 'T', 'TRAIN'   then puts trains.delete(trains.select { |tr| tr.number==choice_arr.first.to_i}.first).inspect
-    when 'V', 'VAN'     then puts vans.delete(vans.select { |vn| vn.number==choice_arr.first.to_i}.first).inspect
-    when 'R', 'ROUTE'   then puts routes.delete(routes[choice_arr.first.to_i]).inspect
+    when 'S', 'STATION'
+      station = stations.select { |st| st.name==choice_arr.join(' ')}.first
+      station.trains.each { |train| 
+                            if train.route.nil?
+                              station.depart(train)
+                            else
+                              train.move_up
+                              train.move_down if train.station == station
+                              station.depart(train) if train.station == station
+                            end
+                           }
+      routes.each { |route| route.stations.delete(station) }
+      stations.delete(station)
+      puts 'Станция удалена'
+    when 'T', 'TRAIN'
+      trains.delete(trains.select { |tr| tr.number==choice_arr.first.to_i}.first)
+      puts 'Поезд удален'
+    when 'V', 'VAN'
+      vans.delete(vans.select { |vn| vn.number==choice_arr.first.to_i}.first)
+      puts 'Вагон удален'
+    when 'R', 'ROUTE'
+      routes.delete(routes[choice_arr.first.to_i])
+      puts 'Маршрут удален'
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -281,10 +314,14 @@ class MainCLI
     train = trains.select { |tr| tr.number == number}.first
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'H', 'HOOK'    then menu_train_hook(train, choice_arr)
-    when 'U', 'UNHOOK'  then menu_train_unhook(train, choice_arr)
-    when 'M', 'MOVE'    then menu_train_move(train, choice_arr)
-    when 'R', 'ROUTE'   then menu_train_route(train, choice_arr)
+    when 'H', 'HOOK'
+      menu_train_hook(train, choice_arr)
+    when 'U', 'UNHOOK'
+      menu_train_unhook(train, choice_arr)
+    when 'M', 'MOVE'
+      menu_train_move(train, choice_arr)
+    when 'R', 'ROUTE'
+      menu_train_route(train, choice_arr)
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -293,7 +330,6 @@ class MainCLI
   def menu_route_add(route, stations_names_str)
     stations_names = stations_names_str.split(';')
     stations_names.each { |name| route.add(stations.select{|st| st.name == name}.first) }
-    return route
   end
 
   def menu_route(choice_arr)
@@ -301,7 +337,9 @@ class MainCLI
     route = routes[n]
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'A', 'ADD'    then puts menu_route_add(route, choice_arr.join(' ')).inspect
+    when 'A', 'ADD'    
+      menu_route_add(route, choice_arr.join(' '))
+      puts route
     else
       puts ERROR_WRONG_COMMAND
     end

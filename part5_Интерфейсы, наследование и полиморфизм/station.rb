@@ -7,7 +7,7 @@ class Station
   end
 
   def arrive(train)
-    @trains << train
+    trains << train
     train.set_station(self) if train.current_station != self
   end
 
@@ -21,10 +21,10 @@ class Station
   end
 
   def to_s
-    @name
+    name
   end
 
 private 
-  attr_writer :trains
+attr_writer :trains
 
 end

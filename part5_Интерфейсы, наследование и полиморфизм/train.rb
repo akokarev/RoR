@@ -6,53 +6,53 @@ class Train
   end
 
   def initialize(number)
+    type
     @number = number
     @vans = []
     @speed = 0
   end
 
   def set_station(new_station)
-    if @station != new_station
+    if station != new_station
       old_station = @station
-      @station = new_station
+      station = new_station
       old_station.depart(self) if old_station
       new_station.arrive(self) if new_station
     end
-    @station
   end
 
   def accelerate(delta_speed)
-    @speed += delta_speed if delta_speed > 0
+    speed += delta_speed if delta_speed > 0
   end
 
   def slow(delta_speed)
-    @speed -= delta_speed if delta_speed > 0
+    speed -= delta_speed if delta_speed > 0
     stop if @speed < 0
   end
 
   def stop
-    @speed = 0
+    speed = 0
   end
 
-  def hook(van)
-    raise 'Вагон должен быть указан' unless van.kind_of? Van
-    raise 'Тип поезда не соответсвует типу вагона' unless self.type == van.type  
-    raise 'Вагон нельзя прицепить дважды' if vans.include?(van)
+  def hook(new_van)
+    raise 'Вагон должен быть указан' unless new_van.kind_of? Van
+    raise 'Тип поезда не соответсвует типу вагона' unless self.type == new_van.type
+    raise 'Вагон нельзя прицепить дважды' if vans.include?(new_van)
     raise 'Нельзя прицепить вагон во время движения поезда' unless self.speed == 0
 
-    vans << van
-    van.hook(self) unless van.train == self
+    vans << new_van
+    new_van.hook(self) unless new_van.train == self
   end
 
-  def unhook(van)
-    raise 'Вагон не был прицеплен' unless vans.include?(van) 
+  def unhook(old_van)
+    raise 'Вагон не был прицеплен' unless vans.include?(old_van) 
     raise 'Нельзя отцепить вагон во время движения поезда' unless self.speed == 0
-    vans.delete(van)
-    van.unhook unless van.train == self
+    vans.delete(old_van)
+    old_van.unhook if old_van.train == self
   end
 
-  def set_route(route)
-    @route = route
+  def set_route(new_route)
+    route = new_route
     self.set_station(route.stations.first)
   end
 
@@ -77,14 +77,14 @@ class Train
   end
 
   def current_station
-    @station
+    station
   end
 
   def to_s
     "Поезд \##{number} (#{type}): скорость #{speed}км/ч, вагонов #{vans.count}, станция #{station}, маршрут #{route}"
   end
 
-  private 
-  attr_writer :speed, :station, :vans
+private
+attr_writer :vans, :speed, :route, :station
 
 end
