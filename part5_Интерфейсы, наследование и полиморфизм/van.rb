@@ -7,7 +7,6 @@ class Van
   end
 
   def initialize(number)
-    type
     @number = number
     @train = nil
   end

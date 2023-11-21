@@ -7,7 +7,6 @@ class Train
   end
 
   def initialize(number)
-    type
     @number = number
     @vans = []
     @speed = 0

@@ -152,7 +152,7 @@ class MainCLI
 
   def show_van(number)
     van = vans.select{| van| van.number==number}.first
-    puts "#{van}"
+    puts van
   end
 
 
