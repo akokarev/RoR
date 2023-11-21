@@ -1,21 +1,14 @@
 require_relative '../trains/train.rb'
-require_relative '../modules/manufacturer.rb'
 class Van
-  include Manufacturer
   attr_reader :number, :train
 
   def type 
     raise NotImplementedError
   end
 
-  def initialize(number, manufacturer = nil)
+  def initialize(number)
     @number = number
     @train = nil
-    if manufacturer
-      @manufacturer = manufacturer
-    else
-      @manufacturer = 'NoName'
-    end
   end
 
   def hook(new_train)
@@ -36,10 +29,10 @@ class Van
   end
 
   def to_s
-    "Вагон #{self.number} #{self.type} by #{self.manufacturer} #{self.train.nil? ? 'отцеплен' : self.train.number}"
+    "Вагон #{self.number} #{self.type} #{self.train.nil? ? 'отцеплен' : self.train.number}"
   end
 
-  private
-  attr_writer :train
+private
+attr_writer :train
 
 end

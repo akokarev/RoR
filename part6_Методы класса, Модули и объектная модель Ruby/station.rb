@@ -1,23 +1,9 @@
-require_relative 'modules/instance_counter.rb'
 class Station
-  include InstanceCounter
   attr_reader :name, :trains
-
-  @@stations = []
-
-  def self.all
-    @@stations.clone
-  end
-
-  def destroy
-    @@stations.delete(self)
-  end
 
   def initialize(name)
     @name = name
     @trains = []
-    @@stations << self
-    register_instance
   end
 
   def arrive(new_train)
@@ -38,7 +24,7 @@ class Station
     self.name
   end
 
-  private 
-  attr_writer :trains
+private 
+attr_writer :trains
 
 end
