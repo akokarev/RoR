@@ -94,6 +94,7 @@ class MainCLI
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'route'} #{col_param '<number>'}             #{col_comment 'Установить маршрут #'}"
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move up'}                    #{col_comment 'Переместить поезд вперед по маршруту'}"
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move down'}                  #{col_comment 'Переместить поезд назад по маршруту'}"
+    puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move station'} #{col_param '<name>'}        #{col_comment 'Переместить поезд на станцию'}"
     puts "#{col_subtitle 'Вагоны'} #{col_count "(#{vans.count})"}"
     puts "  #{col_command 'new van [cargo]|[passanger]'} #{col_param '<number>'}      #{col_comment 'Создать новый вагон'}"
     puts "  #{col_command 'show van'} #{col_param '<number>'}                         #{col_comment 'Показать подробную информацию о вагоне'}"
@@ -127,30 +128,30 @@ class MainCLI
   end
 
   def new_route(stations_names)
-    station_a = stations.select{|st| st.name == stations_names.first}.first
-    station_b = stations.select{|st| st.name == stations_names.last}.first
+    station_a = stations.select{ |station| station.name == stations_names.first}.first
+    station_b = stations.select{ |station| station.name == stations_names.last}.first
     route = Route.new(station_a, station_b)
     if stations_names.count > 2
-      stations_names[1..-2].each {|st_name| route.add(stations.select{|st| st.name == st_name}) }   
+      stations_names[1..-2].each { |st_name| route.add(stations.select{ |station| station.name == st_name }.first) }   
     end
     routes << route
     puts "\##{routes.count-1}: #{routes.last}"    
   end
 
   def show_station(name)
-    station = stations.select{|st| st.name==name}.first
+    station = stations.select{ |station| station.name==name}.first
     puts "=#{station}="
     station.trains.each { |train| puts train}
   end
 
   def show_train(number)
-    train = trains.select{|tr| tr.number==number}.first
+    train = trains.select{ |train| train.number==number}.first
     puts "=#{train}="
     train.vans.each { |van| puts van }
   end
 
   def show_van(number)
-    van = vans.select{|vn| vn.number==number}.first
+    van = vans.select{| van| van.number==number}.first
     puts "#{van}"
   end
 
@@ -261,17 +262,27 @@ class MainCLI
                               station.depart(train) if train.station == station
                             end
                            }
-      routes.each { |route| route.stations.delete(station) }
+      routes.each { |route| 
+                    route.stations.delete(station)
+                    routes.delete(route) if route.stations.count == 0
+                  }
       stations.delete(station)
       puts 'Станция удалена'
     when 'T', 'TRAIN'
-      trains.delete(trains.select { |tr| tr.number==choice_arr.first.to_i}.first)
+      train = trains.select { |tr| tr.number==choice_arr.first.to_i}.first
+      train.vans.each { |van| van.unhook }
+      train.station.depart(train)
+      trains.delete(train)
       puts 'Поезд удален'
     when 'V', 'VAN'
-      vans.delete(vans.select { |vn| vn.number==choice_arr.first.to_i}.first)
+      van = vans.select { |van| van.number==choice_arr.first.to_i}.first
+      van.unhook
+      vans.delete(van)
       puts 'Вагон удален'
     when 'R', 'ROUTE'
-      routes.delete(routes[choice_arr.first.to_i])
+      route = routes[choice_arr.first.to_i]
+      trains.each { |train| train.set_route(nil) if train.route == route}
+      routes.delete(route)
       puts 'Маршрут удален'
     else
       puts ERROR_WRONG_COMMAND
@@ -294,10 +305,19 @@ class MainCLI
 
   def menu_train_move(train, choice_arr)
     number = choice_arr.first.to_i
-    direction = choice_arr.first.upcase
+    direction = choice_arr.shift.upcase
     case direction
-    when 'U', 'UP'   then puts train.move_up.inspect
-    when 'D', 'DOWN' then puts train.move_down.inspect
+    when 'U', 'UP'
+      train.move_up
+      puts "Поезд №#{train.number} на станции #{train.station}"
+    when 'D', 'DOWN' 
+      train.move_down
+      puts "Поезд №#{train.number} на станции #{train.station}"
+    when 'S', 'STATION'
+      st_name = choice_arr.join(' ')
+      station = stations.select { |station| station.name == st_name }.first
+      train.set_station(station)
+      puts "Поезд №#{train.number} прибыл на станцию #{station}"
     else
       puts ERROR_WRONG_COMMAND
     end

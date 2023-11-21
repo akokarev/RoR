@@ -5,16 +5,16 @@ class Route
     @stations = [first, last]
   end
 
-  def add(pos = -2, station)
-    stations.insert(pos, station) if station
+  def add(pos = -2, new_station)
+    self.stations.insert(pos, new_station) if new_station
   end
 
-  def remove(station)
-    stations.delete(station)
+  def remove(old_station)
+    self.stations.delete(old_station)
   end
 
   def to_s
-     "[#{stations.join '-'}]"
+     "[#{self.stations.join '-'}]"
   end
 
 end

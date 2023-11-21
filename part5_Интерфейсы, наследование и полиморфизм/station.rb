@@ -6,22 +6,22 @@ class Station
     @trains = []
   end
 
-  def arrive(train)
-    trains << train
-    train.set_station(self) if train.current_station != self
+  def arrive(new_train)
+    self.trains << new_train
+    new_train.set_station(self) unless new_train.station == self
   end
 
-  def depart(train)
-    trains.delete(train)
-    train.set_station(nil) if train.current_station == self
+  def depart(old_train)
+    self.trains.delete(old_train)
+    old_train.set_station(nil) if old_train.station == self
   end
 
   def by_type(type)
-    trains.select {|t| t.type == type}
+    self.trains.select {|t| t.type == type}
   end
 
   def to_s
-    name
+    self.name
   end
 
 private 
