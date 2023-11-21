@@ -1,15 +1,39 @@
 require_relative '../vans/van.rb'
+require_relative '../modules/manufacturer.rb'
 class Train
+  include Manufacturer
   attr_reader :number, :vans, :speed, :route, :station
+
+  @@trains = []
+  
+  class << self
+    def all
+      @@trains.clone
+    end
+
+    def find(number)
+      @@trains.select { |train| train.number == number }.first
+    end
+  end
+
+  def destroy
+    @@trains.delete(self)
+  end
 
   def type 
     raise NotImplementedError
   end
 
-  def initialize(number)
+  def initialize(number, manufacturer = nil)
     @number = number
     @vans = []
     @speed = 0
+    if manufacturer
+      @manufacturer = manufacturer
+    else
+      @manufacturer = 'NoName'
+    end
+    @@trains << self
   end
 
   def set_station(new_station)
@@ -77,10 +101,10 @@ class Train
   end
 
   def to_s
-    "Поезд \##{self.number} (#{self.type}): скорость #{self.speed}км/ч, вагонов #{self.vans.count}, станция #{self.station}, маршрут #{self.route}"
+    "Поезд \##{self.number} (#{self.type}) by #{self.manufacturer}: скорость #{self.speed}км/ч, вагонов #{self.vans.count}, станция #{self.station}, маршрут #{self.route}"
   end
 
-private
-attr_writer :vans, :speed, :route, :station
+  private
+  attr_writer :vans, :speed, :route, :station
 
 end
