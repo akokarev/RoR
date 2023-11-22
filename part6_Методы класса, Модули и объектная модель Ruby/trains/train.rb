@@ -28,7 +28,7 @@ class Train
     @number = number
     @vans = []
     @speed = 0
-    @manufacturer = manufacturer ? manufacturer : 'NoName'
+    @manufacturer = manufacturer || 'NoName'
     @@trains << self
   end
 

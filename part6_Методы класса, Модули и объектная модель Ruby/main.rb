@@ -277,10 +277,10 @@ class MainCLI
       station = Station.all.select { |st| st.name==choice_arr.join(' ')}.first
       station.destroy
       #Код ниже должен быть после перемещения поезда. В будущем убрать внутрь destroy, после доработки класса Route.
-      routes.each { |route| 
-                  route.stations.delete(station)
-                  routes.delete(route) if route.stations.count == 0
-                  }
+      routes.each do |route| 
+                    route.stations.delete(station)
+                    routes.delete(route) if route.stations.count == 0
+                  end
       puts 'Станция удалена'
     when 'T', 'TRAIN'
       train = Train.all.select { |tr| tr.number==choice_arr.first.to_i}.first
@@ -384,7 +384,7 @@ class MainCLI
   end
 
   def start()
-    loop {
+    loop do
       choice = ask PROMT
       print PROMT_END
       
@@ -407,7 +407,7 @@ class MainCLI
           end
         end
       end
-    }
+    end
   end
 
 end #class MainCLI

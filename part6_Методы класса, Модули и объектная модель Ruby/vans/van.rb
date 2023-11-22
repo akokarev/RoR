@@ -11,7 +11,7 @@ class Van
   def initialize(number, manufacturer = nil)
     @number = number
     @train = nil
-    @manufacturer = manufacturer ? manufacturer : 'NoName'
+    @manufacturer = manufacturer || 'NoName'
   end
 
   def hook(new_train)
