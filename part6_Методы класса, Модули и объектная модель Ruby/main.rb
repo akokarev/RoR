@@ -122,7 +122,7 @@ class MainCLI
   def new_van(number, type, manufacturer = nil)
     case type
     when :cargo then vans << CargoVan.new(number, manufacturer)
-    when :passenger then vans << PassengerVan.new(number, manufacturer?)
+    when :passenger then vans << PassengerVan.new(number, manufacturer)
     end
     puts "\##{vans.count-1}: #{vans.last}"
   end
