@@ -10,6 +10,15 @@ class Station
   end
 
   def destroy
+    self.trains.each { |train| 
+                        if train.route.nil?
+                          self.depart(train)
+                        else
+                          train.move_up
+                          train.move_down if train.station == self
+                          self.depart(train) if train.station == self
+                        end
+                      }
     @@stations.delete(self)
   end
 

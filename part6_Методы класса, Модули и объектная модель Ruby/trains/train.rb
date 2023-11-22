@@ -28,11 +28,7 @@ class Train
     @number = number
     @vans = []
     @speed = 0
-    if manufacturer
-      @manufacturer = manufacturer
-    else
-      @manufacturer = 'NoName'
-    end
+    @manufacturer = manufacturer ? manufacturer : 'NoName'
     @@trains << self
   end
 

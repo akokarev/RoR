@@ -77,7 +77,7 @@ class MainCLI
   def show_help 
     puts
     puts col_title '=== Управление железной дорогой ==='
-    puts "#{col_subtitle 'Станции'} #{col_count "(#{Station.all.count})"}"
+    puts "#{col_subtitle 'Станции'} #{col_count "(#{Station.instances})"}"
     puts "  #{col_command 'new station'} #{col_param '<name>'}                                      #{col_comment 'Создать новую станцию'}"
     puts "  #{col_command 'show station'} #{col_param '<name>'}                                     #{col_comment 'Показать подробную информацию о станции'}"
     puts "  #{col_command 'list stations'}                                           #{col_comment 'Показать список всех станций'}"
@@ -122,7 +122,7 @@ class MainCLI
   def new_van(number, type, manufacturer = nil)
     case type
     when :cargo then vans << CargoVan.new(number, manufacturer)
-    when :passenger then vans << PassengerVan.new(number, manufacturer)
+    when :passenger then vans << PassengerVan.new(number, manufacturer?)
     end
     puts "\##{vans.count-1}: #{vans.last}"
   end
@@ -176,7 +176,7 @@ class MainCLI
       type_str = choice_arr.shift.upcase
       number = choice_arr.shift.to_i
       manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
-      
+
       case type_str
       when 'C','CARGO'
         type = :cargo
@@ -275,20 +275,12 @@ class MainCLI
     case choice_current
     when 'S', 'STATION'
       station = Station.all.select { |st| st.name==choice_arr.join(' ')}.first
-      station.trains.each { |train| 
-                            if train.route.nil?
-                              station.depart(train)
-                            else
-                              train.move_up
-                              train.move_down if train.station == station
-                              station.depart(train) if train.station == station
-                            end
-                           }
-      routes.each { |route| 
-                    route.stations.delete(station)
-                    routes.delete(route) if route.stations.count == 0
-                  }
       station.destroy
+      #Код ниже должен быть после перемещения поезда. В будущем убрать внутрь destroy, после доработки класса Route.
+      routes.each { |route| 
+                  route.stations.delete(station)
+                  routes.delete(route) if route.stations.count == 0
+                  }
       puts 'Станция удалена'
     when 'T', 'TRAIN'
       train = Train.all.select { |tr| tr.number==choice_arr.first.to_i}.first
