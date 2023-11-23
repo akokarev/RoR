@@ -2,7 +2,10 @@ class Route
   attr_reader :stations
 
   def validate!
-    self.stations.each { |station| raise 'Станции в маршруте должны быть валидные' unless station.valid? }
+    self.stations.each do |station|
+      raise 'Станция должна быть типа Station' unless station.kind_of? Station
+      raise 'Станции в маршруте должны быть валидные' unless station.valid?
+    end
   end
 
   def valid?

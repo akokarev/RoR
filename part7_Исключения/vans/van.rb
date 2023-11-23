@@ -8,21 +8,22 @@ class Van
     raise NotImplementedError
   end
 
-  def validate_train!(train)
+  def validate_train!(train, recur = false)
     unless train.nil?
       raise 'Поезд должен быть наследником класса Train' unless train.kind_of? Train
       raise 'Тип вагона не соответсвует типу поезда' unless self.type == train.type
+      raise 'Поезд должен быть валидным' unless recur || train.valid?(true)
     end
   end
 
-  def validate!
-    raise 'Номер поезда целое число больше нуля' unless self.number.kind_of? Integer && self.number > 0
+  def validate!(recur = false)
+    raise 'Номер вагона целое число больше нуля' unless self.number.kind_of? Integer && self.number > 0
     raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
-    validate_train!(self.train)
+    validate_train!(self.train, recur)
   end
 
-  def valid?
-    validate!
+  def valid?(recur = false)
+    validate!(recur)
     true
   rescue
     false
