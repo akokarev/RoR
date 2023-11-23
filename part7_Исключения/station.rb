@@ -1,4 +1,5 @@
 require_relative 'modules/instance_counter.rb'
+require_relative 'trains/train.rb'
 class Station
   include InstanceCounter
   attr_reader :name, :trains
@@ -7,6 +8,32 @@ class Station
 
   def self.all
     @@stations.clone
+  end
+
+  def validate!
+#    raise 'Название станции должно быть строка' unless self.name.kind_of? String
+#    raise 'Название станции не может быть пустым' if self.name.length == 0
+    raise 'Название станции должно состоять из русских и английских букв, цифр' if self.name !~ /\A[\p{Cyrillic} \w]+\z/
+
+    self.trains.each do |train| 
+      raise "Поезда должны иметь родителя класса Train: #{train.inspect}" unless train.class.ancestors.include? Train 
+    end
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
+  end
+
+  def initialize(name)
+    @name = name
+    @trains = []
+    validate!
+
+    @@stations << self
+    register_instance
   end
 
   def destroy
@@ -20,13 +47,6 @@ class Station
                         end
                       end
     @@stations.delete(self)
-  end
-
-  def initialize(name)
-    @name = name
-    @trains = []
-    @@stations << self
-    register_instance
   end
 
   def arrive(new_train)

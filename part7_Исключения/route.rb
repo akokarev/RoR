@@ -1,8 +1,20 @@
 class Route
   attr_reader :stations
 
+  def validate!
+    self.stations.each { |station| raise 'Станции в маршруте должны быть валидные' unless station.valid? }
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
+  end
+
   def initialize(first, last)
     @stations = [first, last]
+    validate!
   end
 
   def add(pos = -2, new_station)
