@@ -16,12 +16,29 @@ class Train
     end
   end
 
-  def destroy
-    @@trains.delete(self)
-  end
-
   def type 
     raise NotImplementedError
+  end
+
+  def validate_van!(van, recur = false)
+    raise 'Вагон должен быть наследником класса Van' unless van.kind_of? Van
+    raise 'Тип вагона не соответсвует типу поезда' unless self.type == van.type
+    raise 'Вагон должен быть валидным' unless recur || van.valid?(true)
+  end
+  
+  def validate!(recur=false)
+    raise 'Номер поезда целое число больше нуля' unless self.number.is_a?(Integer) && self.number > 0
+    raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
+    self.vans.each { |van| validate_van!(van, recur) }
+    raise 'Маршрут должен быть валидным' unless route.valid?
+    raise 'Если указана, станция должна быть валидная' unless station.nil? || recur || station.valid?(true)
+  end
+
+  def valid?(recur = false)
+    validate!(recur)
+    true
+  rescue
+    false
   end
 
   def initialize(number, manufacturer = nil)
@@ -29,7 +46,13 @@ class Train
     @vans = []
     @speed = 0
     @manufacturer = manufacturer || 'NoName'
+    validate!
+
     @@trains << self
+  end
+
+  def destroy
+    @@trains.delete(self)
   end
 
   def set_station(new_station)

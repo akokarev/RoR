@@ -10,18 +10,19 @@ class Station
     @@stations.clone
   end
 
-  def validate!
+  def validate!(recur=false)
 #    raise 'Название станции должно быть строка' unless self.name.kind_of? String
 #    raise 'Название станции не может быть пустым' if self.name.length == 0
     raise 'Название станции должно состоять из русских и английских букв, цифр' if self.name !~ /\A[\p{Cyrillic} \w]+\z/
 
     self.trains.each do |train| 
-      raise "Поезда должны иметь родителя класса Train: #{train.inspect}" unless train.class.ancestors.include? Train 
+      raise "Поезда должны происходить от Train: #{train.inspect}" unless train.class.ancestors.include? Train
+      raise "Поезда на станции должны быть валидными" unless recur || train.valid?(true)
     end
   end
 
-  def valid?
-    validate!
+  def valid?(recur = false)
+    validate!(recur)
     true
   rescue
     false
