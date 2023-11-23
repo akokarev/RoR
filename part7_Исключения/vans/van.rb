@@ -8,17 +8,38 @@ class Van
     raise NotImplementedError
   end
 
+  def validate_train!(train)
+    unless train.nil?
+      raise 'Поезд должен быть наследником класса Train' unless train.kind_of? Train
+      raise 'Тип вагона не соответсвует типу поезда' unless self.type == train.type
+    end
+  end
+
+  def validate!
+    raise 'Номер поезда целое число больше нуля' unless self.number.kind_of? Integer && self.number > 0
+    raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
+    validate_train!(self.train)
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
+  end
+
   def initialize(number, manufacturer = nil)
     @number = number
     @train = nil
     @manufacturer = manufacturer || 'NoName'
+    validate!
   end
 
   def hook(new_train)
-    raise 'Поезд должен быть указан' unless new_train.kind_of? Train
-    raise 'Тип вагона не соответсвует типу поезда' unless self.type == new_train.type  
+    validate_train!(new_train)
     raise 'Вагон нельзя прицепить дважды' unless self.train.nil?
     raise 'Нельзя прицепить вагон во время движения поезда' unless new_train.speed == 0
+
     self.train = new_train
     self.train.hook(self) unless self.train.vans.include?(self)
   end
