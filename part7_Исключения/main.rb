@@ -415,4 +415,20 @@ end #class MainCLI
 
 puts "Thinknetica: Управление ЖД\n(c)2023 Anton Kokarev\n\nВведите help для справки"
 menu = MainCLI.new
-menu.start
+
+normal_exit = false
+while !normal_exit do 
+  begin
+    menu.start
+    normal_exit = true
+
+  rescue  StandardError => e
+    puts e.inspect
+    retry
+  ensure
+    puts "=========================="
+    pp menu
+    puts "=========================="
+    pp Train.all
+  end
+end

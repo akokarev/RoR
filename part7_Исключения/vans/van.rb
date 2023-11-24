@@ -17,7 +17,7 @@ class Van
   end
 
   def validate!(recur = false)
-    raise 'Номер вагона целое число больше нуля' unless self.number.kind_of? Integer && self.number > 0
+    raise 'Номер вагона целое число больше нуля' unless self.number.kind_of?(Integer) && self.number > 0
     raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
     validate_train!(self.train, recur)
   end
