@@ -27,11 +27,14 @@ class Train
   end
   
   def validate!(recur=false)
-    raise 'Номер поезда целое число больше нуля' unless self.number.is_a?(Integer) && self.number > 0
+    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if self.number !~ /[a-z0-9]{3}[[-]{0,1}[a-z0-9]{2}]{0,1}/ 
     raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
     self.vans.each { |van| validate_van!(van, recur) }
-    raise 'Маршрут должен быть валидным' unless route.valid?
-    raise 'Если указана, станция должна быть валидная' unless station.nil? || recur || station.valid?(true)
+    #bug
+    #Если инициатор проверки вагон прицепленный к поезду, то будет проверен поезд, но не маршрут и не станция
+    #Нужен более глубокий анализ recur, например recur = {:train => true; :station=>false; :route => false}
+    raise 'Если указан, маршрут должен быть валидным' unless self.route.nil? || recur || self.route.valid?(true)
+    raise 'Если указана, станция должна быть валидная' unless self.station.nil? || recur || self.station.valid?(true)
   end
 
   def valid?(recur = false)
