@@ -27,7 +27,7 @@ class Train
   end
   
   def validate!(recur=false)
-    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if self.number !~ /[a-z0-9]{3}[[-]{0,1}[a-z0-9]{2}]{0,1}/ 
+    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if self.number !~ /\A[\w\p{Cyrillic}]{3}(-[\w\p{Cyrillic}]{2}){0,1}\z/ 
     raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
     self.vans.each { |van| validate_van!(van, recur) }
     #bug
