@@ -11,6 +11,7 @@ class MainCLI
   attr_accessor :vans, :routes
 
   ERROR_WRONG_COMMAND = "\033[0;31mНеверная команда!\033[0m Смотрите справку: \033[0;32mhelp\033[0m"
+  ERROR_WRONG_TYPE = "\033[0;31mНеверный тип!\033[0m Допустимые типы: \033[0;32mcargo passenger\033[0m"
   ERROR_WRONG_STATION = "\033[0;31mСтанция не найдена!\033[0m"
   PROMT = "\033[0;32m> "
   PROMT_END = "\033[0m"
@@ -183,7 +184,7 @@ class MainCLI
       when 'P', 'PASSENGER' 
         type = :passenger
       else
-        puts ERROR_WRONG_COMMAND
+        puts ERROR_WRONG_TYPE
         return
       end
 
@@ -205,7 +206,7 @@ class MainCLI
       when 'P', 'PASSENGER' 
         type = :passenger
       else
-        puts ERROR_WRONG_COMMAND
+        puts ERROR_WRONG_TYPE
         return
       end
 
