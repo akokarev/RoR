@@ -174,7 +174,7 @@ class MainCLI
   def menu_new_train(choice_arr)
     if choice_arr.count >= 2
       type_str = choice_arr.shift.upcase
-      number = choice_arr.shift.to_i
+      number = choice_arr.shift
       manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
 
       case type_str
