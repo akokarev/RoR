@@ -185,6 +185,7 @@ class MainCLI
         type = :passenger
       else
         puts ERROR_WRONG_TYPE
+        puts ERROR_WRONG_COMMAND
         return
       end
 
@@ -207,6 +208,7 @@ class MainCLI
         type = :passenger
       else
         puts ERROR_WRONG_TYPE
+        puts ERROR_WRONG_COMMAND
         return
       end
 
