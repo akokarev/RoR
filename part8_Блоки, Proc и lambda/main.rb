@@ -95,10 +95,13 @@ class MainCLI
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move down'}                                #{col_comment 'Переместить поезд назад по маршруту'}"
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move station'} #{col_param '<name>'}                      #{col_comment 'Переместить поезд на станцию'}"
     puts "#{col_subtitle 'Вагоны'} #{col_count "(#{vans.count})"}"
-    puts "  #{col_command 'new van [cargo]|[passanger]'} #{col_param '<number>'} #{col_param '[manufacturer]'}     #{col_comment 'Создать новый вагон'}"
+    puts "  #{col_command 'new van [cargo]|[passanger]'} #{col_param '<number>'} #{col_param '[manufacturer]'} #{col_param '<?>'} #{col_comment 'Создать новый вагон'}"
+    puts "                                 Где #{col_param '<?>'} это:  #{col_param '<seats>'}  - для пассажирского вагона"
+    puts "                                               #{col_param '<volume>'} - для грузового вагона"
     puts "  #{col_command 'show van'} #{col_param '<number>'}                                       #{col_comment 'Показать подробную информацию о вагоне'}"
     puts "  #{col_command 'list vans'}                                               #{col_comment 'Показать список всех вагонов'}"
     puts "  #{col_command 'delete van'} #{col_param '<number>'}                                     #{col_comment 'Удалить вагон'}"
+    puts "  #{col_command 'take'} #{col_param '<van_number>'} #{col_param '[<volume>]'}                            #{col_comment 'Получить место в пассажирском вагоне или заполнить грузовой'}"
     puts "#{col_subtitle 'Маршруты'} #{col_count "(#{routes.count})"}"
     puts "  #{col_command 'new route'} #{col_param '<A>'}#{col_command ';'}#{col_param '<B>'}                                       #{col_comment 'Создать новый маршрут из станции А до станции В'}"
     puts "  #{col_command 'show route'} #{col_param '<#number>'}                                    #{col_comment 'Показать подробную информацию о маршруте'}"
@@ -120,10 +123,10 @@ class MainCLI
     puts "\##{Train.all.count-1}: #{Train.all.last}"
   end
 
-  def new_van(number, type, manufacturer = nil)
+  def new_van(number, type, manufacturer = nil, total)
     case type
-    when :cargo then vans << CargoVan.new(number, manufacturer)
-    when :passenger then vans << PassengerVan.new(number, manufacturer)
+    when :cargo then vans << CargoVan.new(number, manufacturer, total)
+    when :passenger then vans << PassengerVan.new(number, manufacturer, total)
     end
     puts "\##{vans.count-1}: #{vans.last}"
   end
@@ -195,9 +198,10 @@ class MainCLI
   end
 
   def menu_new_van(choice_arr)
-    if choice_arr.count >= 2
+    if choice_arr.count >= 3
       type_str = choice_arr.shift.upcase
       number = choice_arr.shift.to_i
+      total = choice_arr.pop.to_i
       manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
 
       case type_str
@@ -210,7 +214,7 @@ class MainCLI
         return
       end
 
-      new_van(number, type, manufacturer)
+      new_van(number, type, manufacturer, total)
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -425,6 +429,7 @@ while !normal_exit do
 
   rescue  StandardError => e
     puts e.inspect
+    puts e.backtrace
     retry
   ensure
     puts "=========================="
