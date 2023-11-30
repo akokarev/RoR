@@ -13,6 +13,9 @@ class MainCLI
   ERROR_WRONG_COMMAND = "\033[0;31mНеверная команда!\033[0m Смотрите справку: \033[0;32mhelp\033[0m"
   ERROR_WRONG_TYPE = "\033[0;31mНеверный тип!\033[0m Допустимые типы: \033[0;32mcargo passenger\033[0m"
   ERROR_WRONG_STATION = "\033[0;31mСтанция не найдена!\033[0m"
+  ERROR_WRONG_TRAIN = "\033[0;31mПоезд не найден!\033[0m"
+  ERROR_WRONG_VAN = "\033[0;31mВагон не найден!\033[0m"
+  ERROR_WRONG_VAN_TYPE = "\033[0;31mНеизвестный тип вагона!\033[0m"
   PROMT = "\033[0;32m> "
   PROMT_END = "\033[0m"
 
@@ -101,7 +104,7 @@ class MainCLI
     puts "  #{col_command 'show van'} #{col_param '<number>'}                                       #{col_comment 'Показать подробную информацию о вагоне'}"
     puts "  #{col_command 'list vans'}                                               #{col_comment 'Показать список всех вагонов'}"
     puts "  #{col_command 'delete van'} #{col_param '<number>'}                                     #{col_comment 'Удалить вагон'}"
-    puts "  #{col_command 'take'} #{col_param '<van_number>'} #{col_param '[<volume>]'}                            #{col_comment 'Получить место в пассажирском вагоне или заполнить грузовой'}"
+    puts "  #{col_command 'train take'} #{col_param '<van_number>'} #{col_param '[<seats>|<volume>]'}              #{col_comment 'Получить место в пассажирском вагоне или заполнить грузовой'}"
     puts "#{col_subtitle 'Маршруты'} #{col_count "(#{routes.count})"}"
     puts "  #{col_command 'new route'} #{col_param '<A>'}#{col_command ';'}#{col_param '<B>'}                                       #{col_comment 'Создать новый маршрут из станции А до станции В'}"
     puts "  #{col_command 'show route'} #{col_param '<#number>'}                                    #{col_comment 'Показать подробную информацию о маршруте'}"
@@ -151,7 +154,7 @@ class MainCLI
   def show_train(number)
     train = Train.find(number)
     if train.nil?
-      puts 'Поезд не найден'
+      puts ERROR_WRONG_TRAIN
       return
     end
     puts "=#{train}="
@@ -348,25 +351,53 @@ class MainCLI
     puts "Поезду назначен на маршрут"
   end
 
-  def menu_train(choice_arr)
-    number = choice_arr.shift.to_i
-    train = Train.find(number)
-    if train.nil?
-      puts 'Поезд не найден'
-      return
-    end
-    choice_current = choice_arr.shift.upcase
-    case choice_current
-    when 'H', 'HOOK'
-      menu_train_hook(train, choice_arr)
-    when 'U', 'UNHOOK'
-      menu_train_unhook(train, choice_arr)
-    when 'M', 'MOVE'
-      menu_train_move(train, choice_arr)
-    when 'R', 'ROUTE'
-      menu_train_route(train, choice_arr)
+  def menu_train_take(choice)
+    number = choice.shift.to_i
+    count = choice.shift.to_i
+    van = vans.select { |van| van.number == number }.first
+    unless van.nil?
+      case van.type
+      when :passenger
+        taked = van.take_seats(count)
+        puts "Занято мест: #{taked[0]}"
+        puts "Не хватило мест: #{taked[1]}" if taked[1]>0
+      when :cargo
+        taked = van.take_volume(count)
+        puts "Занят объем: #{taked[0]}"
+        puts "Не поместилось: #{taked[1]}" if taked[1]>0
+      else
+        puts ERROR_WRONG_VAN_TYPE
+      end
     else
-      puts ERROR_WRONG_COMMAND
+      puts ERROR_WRONG_VAN
+    end
+  end
+
+  def menu_train(choice_arr)
+    word = choice_arr.shift
+    case word.upcase 
+    when 'T', 'TAKE'
+      menu_train_take(choice_arr)
+    else
+      number = word.to_i
+      train = Train.find(number)
+      if train.nil?
+        puts ERROR_WRONG_TRAIN
+        return
+      end
+      choice_current = choice_arr.shift.upcase
+      case choice_current
+      when 'H', 'HOOK'
+        menu_train_hook(train, choice_arr)
+      when 'U', 'UNHOOK'
+        menu_train_unhook(train, choice_arr)
+      when 'M', 'MOVE'
+        menu_train_move(train, choice_arr)
+      when 'R', 'ROUTE'
+        menu_train_route(train, choice_arr)
+      else
+        puts ERROR_WRONG_COMMAND
+      end
     end
   end  
 

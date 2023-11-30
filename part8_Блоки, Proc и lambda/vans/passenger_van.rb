@@ -12,8 +12,14 @@ class PassengerVan < Van
     super(number, manufacturer)
   end
 
-  def take_seat
-    self.seats[:used] += 1 if self.seats[:used] < self.seats[:total]
+  def free_seats
+    self.seats[:total] - self.seats[:used]
+  end
+
+  def take_seats(seats_add = 1)
+    can_be_added = (self.free_seats > seats_add) ? seats_add : self.free_seats
+    self.seats[:used] += can_be_added
+    [can_be_added, seats_add - can_be_added]
   end
 
   def to_s
