@@ -111,7 +111,8 @@ class MainCLI
     puts "  #{col_command 'list routes'}                                             #{col_comment 'Показать список всех маршрутов'}"
     puts "  #{col_command 'delete route'} #{col_param '<#number>'}                                  #{col_comment 'Удалить маршрут'}"
     puts "  #{col_command 'route'} #{col_param '<#number>'} #{col_command 'add'} #{col_param '<station>'}                           #{col_comment 'Добавить станцию'}"
-    puts 
+    puts
+    puts "  #{col_command 'fill'}                                                   #{col_comment 'Добавить тестовые данные'}" 
     puts "  #{col_command 'help'}    #{col_comment 'Показать справку по командам'}"
     puts "  #{col_command 'exit'}    #{col_comment 'Выход'}"
   end
@@ -379,7 +380,7 @@ class MainCLI
     when 'T', 'TAKE'
       menu_train_take(choice_arr)
     else
-      number = word.to_i
+      number = word
       train = Train.find(number)
       if train.nil?
         puts ERROR_WRONG_TRAIN
@@ -419,6 +420,100 @@ class MainCLI
     end
   end
 
+  def fill_sample_data
+    t101 = PassengerTrain.new('101', 'Людиновский ТВСЗ')
+    vp1101 = PassengerVan.new(1101, 'Метровагонмаш', 40)
+    vp1102 = PassengerVan.new(1102, 'Метровагонмаш', 44)
+    vp1103 = PassengerVan.new(1103, 'Метровагонмаш', 44)
+    vp1104 = PassengerVan.new(1104, 'Метровагонмаш', 44)
+    vp1105 = PassengerVan.new(1105, 'Метровагонмаш', 44)
+    vp1106 = PassengerVan.new(1106, 'Метровагонмаш', 44)
+    vp1107 = PassengerVan.new(1107, 'Метровагонмаш', 44)
+    vp1108 = PassengerVan.new(1108, 'Метровагонмаш', 42)
+    t101.hook(vp1101)
+    t101.hook(vp1102)
+    t101.hook(vp1103)
+    t101.hook(vp1104)
+    t101.hook(vp1105)
+    t101.hook(vp1106)
+    t101.hook(vp1107)
+    t101.hook(vp1108)
+
+    t102 = PassengerTrain.new('102-01', 'Людиновский ТВСЗ')
+    vp1201 = PassengerVan.new(1201, 'Метровагонмаш', 40)
+    vp1202 = PassengerVan.new(1202, 'Метровагонмаш', 44)
+    vp1203 = PassengerVan.new(1203, 'Метровагонмаш', 44)
+    vp1204 = PassengerVan.new(1204, 'Метровагонмаш', 44)
+    vp1205 = PassengerVan.new(1205, 'Метровагонмаш', 42)
+    t102.hook(vp1201)
+    t102.hook(vp1202)
+    t102.hook(vp1203)
+    t102.hook(vp1204)
+    t102.hook(vp1205)
+
+    t103 = PassengerTrain.new('103', 'Новочеркасский ЭВСЗ')
+    vp1301 = PassengerVan.new(1201, 'Тверской ВСЗ', 64)
+    vp1302 = PassengerVan.new(1202, 'Тверской ВСЗ', 54)
+    vp1303 = PassengerVan.new(1203, 'Тверской ВСЗ', 81)
+    vp1304 = PassengerVan.new(1204, 'Тверской ВСЗ', 36)
+    t103.hook(vp1301)
+    t103.hook(vp1302)
+    t103.hook(vp1303)
+    t103.hook(vp1304)
+    
+    t104 = CargoTrain.new('104', 'Коломенский завод')
+    vc1401 = CargoVan.new(1401, 'Канашский ВРЗ', 80)
+    vc1402 = CargoVan.new(1402, 'Канашский ВРЗ', 80)
+    vc1403 = CargoVan.new(1403, 'Канашский ВРЗ', 60)
+    vc1404 = CargoVan.new(1404, 'Канашский ВРЗ', 60)
+    vc1405 = CargoVan.new(1405, 'Канашский ВРЗ', 80)
+    vc1406 = CargoVan.new(1406, 'Канашский ВРЗ', 80)
+    t104.hook(vc1401)
+    t104.hook(vc1402)
+    t104.hook(vc1403)
+    t104.hook(vc1404)
+    t104.hook(vc1405)
+    t104.hook(vc1406)
+
+    t105 = CargoTrain.new('105', 'Людиновский ТВСЗ')
+    t106 = CargoTrain.new('106', 'Уралтрансмаш')
+
+    st1 = Station.new('Москва')
+    st2 = Station.new('Питер')
+    st3 = Station.new('Ростов')
+    st4 = Station.new('Краснодар')
+    st5 = Station.new('Сочи')
+    st6 = Station.new('Адлер')
+    st7 = Station.new('Абинск')
+    st8 = Station.new('Крымск')
+    st9 = Station.new('Новокузнецк')
+    st10 = Station.new('Новороссийск')
+    st11 = Station.new('Челябинск')
+
+    r1 = Route.new(st1,st6)
+    r1.add(st2)
+    r1.add(st3)
+    r1.add(st4)
+    r1.add(st5)
+
+    r2 = Route.new(st1,st10)
+    r1.add(st2)
+    r1.add(st3)
+    r1.add(st4)
+    r1.add(st7)
+    r1.add(st8)
+    
+    t101.set_route(r1)
+    t102.set_route(r1)
+    t103.set_route(r2)
+
+    3.times { t103.move_up }
+    4.times { t104.set_route(r2)}
+    
+    t105.set_station(st11)
+    t106.set_station(st3)
+  end
+
   def start()
     loop do
       choice = ask PROMT
@@ -438,6 +533,7 @@ class MainCLI
           when 'D', 'DELETE'  then menu_delete(choice_arr)
           when 'T', 'TRAIN'   then menu_train(choice_arr)
           when 'R', 'ROUTE'   then menu_route(choice_arr)
+          when 'F', 'FILL'    then fill_sample_data
           else
             puts ERROR_WRONG_COMMAND
           end
