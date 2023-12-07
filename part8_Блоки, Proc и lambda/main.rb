@@ -13,6 +13,9 @@ class MainCLI
   ERROR_WRONG_COMMAND = "\033[0;31mНеверная команда!\033[0m Смотрите справку: \033[0;32mhelp\033[0m"
   ERROR_WRONG_TYPE = "\033[0;31mНеверный тип!\033[0m Допустимые типы: \033[0;32mcargo passenger\033[0m"
   ERROR_WRONG_STATION = "\033[0;31mСтанция не найдена!\033[0m"
+  ERROR_WRONG_TRAIN = "\033[0;31mПоезд не найден!\033[0m"
+  ERROR_WRONG_VAN = "\033[0;31mВагон не найден!\033[0m"
+  ERROR_WRONG_VAN_TYPE = "\033[0;31mНеизвестный тип вагона!\033[0m"
   PROMT = "\033[0;32m> "
   PROMT_END = "\033[0m"
 
@@ -95,17 +98,22 @@ class MainCLI
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move down'}                                #{col_comment 'Переместить поезд назад по маршруту'}"
     puts "  #{col_command 'train'} #{col_param '<number>'} #{col_command 'move station'} #{col_param '<name>'}                      #{col_comment 'Переместить поезд на станцию'}"
     puts "#{col_subtitle 'Вагоны'} #{col_count "(#{vans.count})"}"
-    puts "  #{col_command 'new van [cargo]|[passanger]'} #{col_param '<number>'} #{col_param '[manufacturer]'}     #{col_comment 'Создать новый вагон'}"
+    puts "  #{col_command 'new van [cargo]|[passanger]'} #{col_param '<number>'} #{col_param '[manufacturer]'} #{col_param '<?>'} #{col_comment 'Создать новый вагон'}"
+    puts "                                 Где #{col_param '<?>'} это:  #{col_param '<seats>'}  - для пассажирского вагона"
+    puts "                                               #{col_param '<volume>'} - для грузового вагона"
     puts "  #{col_command 'show van'} #{col_param '<number>'}                                       #{col_comment 'Показать подробную информацию о вагоне'}"
     puts "  #{col_command 'list vans'}                                               #{col_comment 'Показать список всех вагонов'}"
     puts "  #{col_command 'delete van'} #{col_param '<number>'}                                     #{col_comment 'Удалить вагон'}"
+    puts "  #{col_command 'train take'} #{col_param '<van_number>'} #{col_param '[<seats>|<volume>]'}              #{col_comment 'Получить место в пассажирском вагоне или заполнить грузовой'}"
     puts "#{col_subtitle 'Маршруты'} #{col_count "(#{routes.count})"}"
     puts "  #{col_command 'new route'} #{col_param '<A>'}#{col_command ';'}#{col_param '<B>'}                                       #{col_comment 'Создать новый маршрут из станции А до станции В'}"
     puts "  #{col_command 'show route'} #{col_param '<#number>'}                                    #{col_comment 'Показать подробную информацию о маршруте'}"
     puts "  #{col_command 'list routes'}                                             #{col_comment 'Показать список всех маршрутов'}"
     puts "  #{col_command 'delete route'} #{col_param '<#number>'}                                  #{col_comment 'Удалить маршрут'}"
     puts "  #{col_command 'route'} #{col_param '<#number>'} #{col_command 'add'} #{col_param '<station>'}                           #{col_comment 'Добавить станцию'}"
-    puts 
+    puts
+    puts "  #{col_command 'fill'}                                                   #{col_comment 'Добавить тестовые данные'}" 
+    puts "  #{col_command 'show all'}                                               #{col_comment 'Показать все станции и поезда на них'}" 
     puts "  #{col_command 'help'}    #{col_comment 'Показать справку по командам'}"
     puts "  #{col_command 'exit'}    #{col_comment 'Выход'}"
   end
@@ -120,10 +128,10 @@ class MainCLI
     puts "\##{Train.all.count-1}: #{Train.all.last}"
   end
 
-  def new_van(number, type, manufacturer = nil)
+  def new_van(number, type, manufacturer = nil, total)
     case type
-    when :cargo then vans << CargoVan.new(number, manufacturer)
-    when :passenger then vans << PassengerVan.new(number, manufacturer)
+    when :cargo then vans << CargoVan.new(number, manufacturer, total)
+    when :passenger then vans << PassengerVan.new(number, manufacturer, total)
     end
     puts "\##{vans.count-1}: #{vans.last}"
   end
@@ -148,7 +156,7 @@ class MainCLI
   def show_train(number)
     train = Train.find(number)
     if train.nil?
-      puts 'Поезд не найден'
+      puts ERROR_WRONG_TRAIN
       return
     end
     puts "=#{train}="
@@ -195,9 +203,10 @@ class MainCLI
   end
 
   def menu_new_van(choice_arr)
-    if choice_arr.count >= 2
+    if choice_arr.count >= 3
       type_str = choice_arr.shift.upcase
       number = choice_arr.shift.to_i
+      total = choice_arr.pop.to_i
       manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
 
       case type_str
@@ -210,7 +219,7 @@ class MainCLI
         return
       end
 
-      new_van(number, type, manufacturer)
+      new_van(number, type, manufacturer, total)
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -240,17 +249,31 @@ class MainCLI
     end 
   end
 
+  def show_all
+    Station.all.each do |station|
+      puts "===[#{station.name}]==="
+      station.each do |train|
+        puts "  Поезд №#{train.to_s_simple}"
+        train.each do |van|
+          puts "    Вагон №#{van.to_s_simple}"
+        end
+      end
+    end
+  end
+
   def menu_show(choice_arr)
     choice_current = choice_arr.shift.upcase
     case choice_current
     when 'S', 'STATION'
       show_station(choice_arr.join(' '))
     when 'T', 'TRAIN'
-      show_train(choice_arr.first.to_i)
+      show_train(choice_arr.first)
     when 'V', 'VAN'
       show_van(choice_arr.first.to_i)
     when 'R', 'ROUTE'
       puts routes[(choice_arr.first.to_i)]
+    when 'A', 'ALL'
+      show_all
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -344,25 +367,53 @@ class MainCLI
     puts "Поезду назначен на маршрут"
   end
 
-  def menu_train(choice_arr)
-    number = choice_arr.shift.to_i
-    train = Train.find(number)
-    if train.nil?
-      puts 'Поезд не найден'
-      return
-    end
-    choice_current = choice_arr.shift.upcase
-    case choice_current
-    when 'H', 'HOOK'
-      menu_train_hook(train, choice_arr)
-    when 'U', 'UNHOOK'
-      menu_train_unhook(train, choice_arr)
-    when 'M', 'MOVE'
-      menu_train_move(train, choice_arr)
-    when 'R', 'ROUTE'
-      menu_train_route(train, choice_arr)
+  def menu_train_take(choice)
+    number = choice.shift.to_i
+    count = choice.shift.to_i
+    van = vans.select { |van| van.number == number }.first
+    unless van.nil?
+      case van.type
+      when :passenger
+        taked = van.take_seats(count)
+        puts "Занято мест: #{taked[0]}"
+        puts "Не хватило мест: #{taked[1]}" if taked[1]>0
+      when :cargo
+        taked = van.take_volume(count)
+        puts "Занят объем: #{taked[0]}"
+        puts "Не поместилось: #{taked[1]}" if taked[1]>0
+      else
+        puts ERROR_WRONG_VAN_TYPE
+      end
     else
-      puts ERROR_WRONG_COMMAND
+      puts ERROR_WRONG_VAN
+    end
+  end
+
+  def menu_train(choice_arr)
+    word = choice_arr.shift
+    case word.upcase 
+    when 'T', 'TAKE'
+      menu_train_take(choice_arr)
+    else
+      number = word
+      train = Train.find(number)
+      if train.nil?
+        puts ERROR_WRONG_TRAIN
+        return
+      end
+      choice_current = choice_arr.shift.upcase
+      case choice_current
+      when 'H', 'HOOK'
+        menu_train_hook(train, choice_arr)
+      when 'U', 'UNHOOK'
+        menu_train_unhook(train, choice_arr)
+      when 'M', 'MOVE'
+        menu_train_move(train, choice_arr)
+      when 'R', 'ROUTE'
+        menu_train_route(train, choice_arr)
+      else
+        puts ERROR_WRONG_COMMAND
+      end
     end
   end  
 
@@ -384,29 +435,138 @@ class MainCLI
     end
   end
 
+  def fill_sample_data
+    menu('new train passenger 101 Людиновский ТВСЗ')
+    menu('new van passenger 1101 Метровагонмаш 40')
+    menu('new van passenger 1102 Метровагонмаш 44')
+    menu('new van passenger 1103 Метровагонмаш 44')
+    menu('new van passenger 1104 Метровагонмаш 44')
+    menu('new van passenger 1105 Метровагонмаш 44')
+    menu('new van passenger 1106 Метровагонмаш 44')
+    menu('new van passenger 1107 Метровагонмаш 44')
+    menu('new van passenger 1108 Метровагонмаш 42')
+    menu('train 101 hook 1101')
+    menu('train 101 hook 1102')
+    menu('train 101 hook 1103')
+    menu('train 101 hook 1104')
+    menu('train 101 hook 1105')
+    menu('train 101 hook 1106')
+    menu('train 101 hook 1107')
+    menu('train 101 hook 1108')
+    menu('train take 1101 10')
+    menu('train take 1102 20')
+    menu('train take 1103 1')
+    menu('train take 1104 2')
+    
+    menu('new train passenger 102-FF Людиновский ТВСЗ')
+    menu('new van passenger 1201 Метровагонмаш 40')
+    menu('new van passenger 1202 Метровагонмаш 44')
+    menu('new van passenger 1203 Метровагонмаш 44')
+    menu('new van passenger 1204 Метровагонмаш 44')
+    menu('new van passenger 1205 Метровагонмаш 44')
+    menu('new van passenger 1206 Метровагонмаш 44')
+    menu('new van passenger 1207 Метровагонмаш 44')
+    menu('new van passenger 1208 Метровагонмаш 42')
+    
+    menu('train 102-FF hook 1201')
+    menu('train 102-FF hook 1202')
+    menu('train 102-FF hook 1203')
+    menu('train 102-FF hook 1204')
+    menu('train 102-FF hook 1205')
+    menu('train 102-FF hook 1206')
+    menu('train 102-FF hook 1207')
+    menu('train 102-FF hook 1208')
+
+    menu('new train passenger 103 Новочеркасский ЭВСЗ')
+    menu('new van passenger 1301 Тверской ВСЗ 64')
+    menu('new van passenger 1302 Тверской ВСЗ 54')
+    menu('new van passenger 1303 Тверской ВСЗ 81')
+    menu('new van passenger 1304 Тверской ВСЗ 36')
+    menu('train 103 hook 1301')
+    menu('train 103 hook 1302')
+    menu('train 103 hook 1303')
+    menu('train 103 hook 1304')
+    
+    menu('new train cargo 104 Коломенский завод')
+    menu('new van cargo 1401 Канашский ВРЗ 80')
+    menu('new van cargo 1402 Канашский ВРЗ 60')
+    menu('new van cargo 1403 Канашский ВРЗ 60')
+    menu('new van cargo 1404 Канашский ВРЗ 40')
+    menu('new van cargo 1405 Канашский ВРЗ 40')
+    menu('new van cargo 1406 Канашский ВРЗ 40')
+    
+    menu('train 104 hook 1401')
+    menu('train 104 hook 1402')
+    menu('train 104 hook 1403')
+    menu('train 104 hook 1404')
+    menu('train 104 hook 1405')
+    menu('train 104 hook 1406')
+    
+    menu('new train cargo 105 Людиновский ТВСЗ')
+    menu('new train passenger 106 Уралтрансмаш')
+    menu('new train passenger 107 Уралтрансмаш')
+    menu('new van cargo 1501 100')
+    menu('new van passenger 1601 100')
+    
+    menu('new station Москва')
+    menu('new station Питер')
+    menu('new station Ростов')
+    menu('new station Краснодар')
+    menu('new station Сочи')
+    menu('new station Адлер')
+    menu('new station Абинск')
+    menu('new station Крымск')
+    menu('new station Новороссийск')
+    menu('new station Новокузнецк')
+    menu('new station Челябинск')
+    menu('new station Крымск')
+    
+    menu('new route Москва;Ростов;Краснодар;Сочи;Адлер')
+    menu('new route Москва;Питер')
+    menu('new route Краснодар;Абинск;Крымск;Новороссийск')
+    menu('new route Краснодар;Сочи;Адлер')
+    menu('new route Челябинск;Новокузнецк;Краснодар;Сочи')
+    
+    menu('train 101 route 0')
+    menu('train 102-FF route 1')
+    menu('train 103 route 2')
+    menu('train 105 route 3')
+    menu('train 106 route 4')
+    menu('train 107 route 5')
+  
+    3.times { menu('train 101 move up') }
+    4.times { menu('train 102-FF move up') }
+  end
+
+  def menu(choice)
+    choice_arr = choice.split(' ')
+    
+    if choice_arr.count >= 1
+      choice_current = choice_arr.shift.upcase
+      case choice_current
+      when 'E', 'EXIT'    then return true
+      when 'H', 'HELP'    then show_help
+      when 'N', 'NEW'     then menu_new(choice_arr)
+      when 'S', 'SHOW'    then menu_show(choice_arr)
+      when 'L', 'LIST'    then menu_list(choice_arr)
+      when 'D', 'DELETE'  then menu_delete(choice_arr)
+      when 'T', 'TRAIN'   then menu_train(choice_arr)
+      when 'R', 'ROUTE'   then menu_route(choice_arr)
+      when 'F', 'FILL'    then fill_sample_data
+      else
+        puts ERROR_WRONG_COMMAND
+      end
+    end
+    false
+  end
+
   def start()
     loop do
       choice = ask PROMT
       print PROMT_END
       
       unless choice.nil?
-        choice_arr = choice.split(' ')
-        
-        if choice_arr.count >= 1
-          choice_current = choice_arr.shift.upcase
-          case choice_current
-          when 'E', 'EXIT'    then break
-          when 'H', 'HELP'    then show_help
-          when 'N', 'NEW'     then menu_new(choice_arr)
-          when 'S', 'SHOW'    then menu_show(choice_arr)
-          when 'L', 'LIST'    then menu_list(choice_arr)
-          when 'D', 'DELETE'  then menu_delete(choice_arr)
-          when 'T', 'TRAIN'   then menu_train(choice_arr)
-          when 'R', 'ROUTE'   then menu_route(choice_arr)
-          else
-            puts ERROR_WRONG_COMMAND
-          end
-        end
+        break if menu(choice)
       end
     end
   end
@@ -425,11 +585,7 @@ while !normal_exit do
 
   rescue  StandardError => e
     puts e.inspect
+    puts e.backtrace
     retry
-  ensure
-    puts "=========================="
-    pp menu
-    puts "=========================="
-    pp Train.all
   end
 end
