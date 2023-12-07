@@ -26,6 +26,10 @@ class PassengerVan < Van
     super + " мест (#{self.seats[:used]}/#{self.seats[:total]})"
   end
 
+  def to_s_simple
+    super + " #{self.seats[:used]}/#{self.seats[:total]}"
+  end
+
   private
   attr_writer :seats
 end

@@ -113,6 +113,7 @@ class MainCLI
     puts "  #{col_command 'route'} #{col_param '<#number>'} #{col_command 'add'} #{col_param '<station>'}                           #{col_comment 'Добавить станцию'}"
     puts
     puts "  #{col_command 'fill'}                                                   #{col_comment 'Добавить тестовые данные'}" 
+    puts "  #{col_command 'show all'}                                               #{col_comment 'Показать все станции и поезда на них'}" 
     puts "  #{col_command 'help'}    #{col_comment 'Показать справку по командам'}"
     puts "  #{col_command 'exit'}    #{col_comment 'Выход'}"
   end
@@ -248,6 +249,18 @@ class MainCLI
     end 
   end
 
+  def show_all
+    Station.all.each do |station|
+      puts "===[#{station.name}]==="
+      station.each do |train|
+        puts "  Поезд №#{train.to_s_simple}"
+        train.each do |van|
+          puts "    Вагон №#{van.to_s_simple}"
+        end
+      end
+    end
+  end
+
   def menu_show(choice_arr)
     choice_current = choice_arr.shift.upcase
     case choice_current
@@ -259,6 +272,8 @@ class MainCLI
       show_van(choice_arr.first.to_i)
     when 'R', 'ROUTE'
       puts routes[(choice_arr.first.to_i)]
+    when 'A', 'ALL'
+      show_all
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -421,106 +436,106 @@ class MainCLI
   end
 
   def fill_sample_data
-    self.menu('new train passenger 101 Людиновский ТВСЗ')
-    self.menu('new van passenger 1101 Метровагонмаш 40')
-    self.menu('new van passenger 1102 Метровагонмаш 44')
-    self.menu('new van passenger 1103 Метровагонмаш 44')
-    self.menu('new van passenger 1104 Метровагонмаш 44')
-    self.menu('new van passenger 1105 Метровагонмаш 44')
-    self.menu('new van passenger 1106 Метровагонмаш 44')
-    self.menu('new van passenger 1107 Метровагонмаш 44')
-    self.menu('new van passenger 1108 Метровагонмаш 42')
-    self.menu('train 101 hook 1101')
-    self.menu('train 101 hook 1102')
-    self.menu('train 101 hook 1103')
-    self.menu('train 101 hook 1104')
-    self.menu('train 101 hook 1105')
-    self.menu('train 101 hook 1106')
-    self.menu('train 101 hook 1107')
-    self.menu('train 101 hook 1108')
-    self.menu('train take 1101 10')
-    self.menu('train take 1102 20')
-    self.menu('train take 1103 1')
-    self.menu('train take 1104 2')
+    menu('new train passenger 101 Людиновский ТВСЗ')
+    menu('new van passenger 1101 Метровагонмаш 40')
+    menu('new van passenger 1102 Метровагонмаш 44')
+    menu('new van passenger 1103 Метровагонмаш 44')
+    menu('new van passenger 1104 Метровагонмаш 44')
+    menu('new van passenger 1105 Метровагонмаш 44')
+    menu('new van passenger 1106 Метровагонмаш 44')
+    menu('new van passenger 1107 Метровагонмаш 44')
+    menu('new van passenger 1108 Метровагонмаш 42')
+    menu('train 101 hook 1101')
+    menu('train 101 hook 1102')
+    menu('train 101 hook 1103')
+    menu('train 101 hook 1104')
+    menu('train 101 hook 1105')
+    menu('train 101 hook 1106')
+    menu('train 101 hook 1107')
+    menu('train 101 hook 1108')
+    menu('train take 1101 10')
+    menu('train take 1102 20')
+    menu('train take 1103 1')
+    menu('train take 1104 2')
     
-    self.menu('new train passenger 102-FF Людиновский ТВСЗ')
-    self.menu('new van passenger 1201 Метровагонмаш 40')
-    self.menu('new van passenger 1202 Метровагонмаш 44')
-    self.menu('new van passenger 1203 Метровагонмаш 44')
-    self.menu('new van passenger 1204 Метровагонмаш 44')
-    self.menu('new van passenger 1205 Метровагонмаш 44')
-    self.menu('new van passenger 1206 Метровагонмаш 44')
-    self.menu('new van passenger 1207 Метровагонмаш 44')
-    self.menu('new van passenger 1208 Метровагонмаш 42')
+    menu('new train passenger 102-FF Людиновский ТВСЗ')
+    menu('new van passenger 1201 Метровагонмаш 40')
+    menu('new van passenger 1202 Метровагонмаш 44')
+    menu('new van passenger 1203 Метровагонмаш 44')
+    menu('new van passenger 1204 Метровагонмаш 44')
+    menu('new van passenger 1205 Метровагонмаш 44')
+    menu('new van passenger 1206 Метровагонмаш 44')
+    menu('new van passenger 1207 Метровагонмаш 44')
+    menu('new van passenger 1208 Метровагонмаш 42')
     
-    self.menu('train 102-FF hook 1201')
-    self.menu('train 102-FF hook 1202')
-    self.menu('train 102-FF hook 1203')
-    self.menu('train 102-FF hook 1204')
-    self.menu('train 102-FF hook 1205')
-    self.menu('train 102-FF hook 1206')
-    self.menu('train 102-FF hook 1207')
-    self.menu('train 102-FF hook 1208')
+    menu('train 102-FF hook 1201')
+    menu('train 102-FF hook 1202')
+    menu('train 102-FF hook 1203')
+    menu('train 102-FF hook 1204')
+    menu('train 102-FF hook 1205')
+    menu('train 102-FF hook 1206')
+    menu('train 102-FF hook 1207')
+    menu('train 102-FF hook 1208')
 
-    self.menu('new train passenger 103 Новочеркасский ЭВСЗ')
-    self.menu('new van passenger 1301 Тверской ВСЗ 64')
-    self.menu('new van passenger 1302 Тверской ВСЗ 54')
-    self.menu('new van passenger 1303 Тверской ВСЗ 81')
-    self.menu('new van passenger 1304 Тверской ВСЗ 36')
-    self.menu('train 103 hook 1301')
-    self.menu('train 103 hook 1302')
-    self.menu('train 103 hook 1303')
-    self.menu('train 103 hook 1304')
+    menu('new train passenger 103 Новочеркасский ЭВСЗ')
+    menu('new van passenger 1301 Тверской ВСЗ 64')
+    menu('new van passenger 1302 Тверской ВСЗ 54')
+    menu('new van passenger 1303 Тверской ВСЗ 81')
+    menu('new van passenger 1304 Тверской ВСЗ 36')
+    menu('train 103 hook 1301')
+    menu('train 103 hook 1302')
+    menu('train 103 hook 1303')
+    menu('train 103 hook 1304')
     
-    self.menu('new train cargo 104 Коломенский завод')
-    self.menu('new van cargo 1401 Канашский ВРЗ 80')
-    self.menu('new van cargo 1402 Канашский ВРЗ 60')
-    self.menu('new van cargo 1403 Канашский ВРЗ 60')
-    self.menu('new van cargo 1404 Канашский ВРЗ 40')
-    self.menu('new van cargo 1405 Канашский ВРЗ 40')
-    self.menu('new van cargo 1406 Канашский ВРЗ 40')
+    menu('new train cargo 104 Коломенский завод')
+    menu('new van cargo 1401 Канашский ВРЗ 80')
+    menu('new van cargo 1402 Канашский ВРЗ 60')
+    menu('new van cargo 1403 Канашский ВРЗ 60')
+    menu('new van cargo 1404 Канашский ВРЗ 40')
+    menu('new van cargo 1405 Канашский ВРЗ 40')
+    menu('new van cargo 1406 Канашский ВРЗ 40')
     
-    self.menu('train 104 hook 1401')
-    self.menu('train 104 hook 1402')
-    self.menu('train 104 hook 1403')
-    self.menu('train 104 hook 1404')
-    self.menu('train 104 hook 1405')
-    self.menu('train 104 hook 1406')
+    menu('train 104 hook 1401')
+    menu('train 104 hook 1402')
+    menu('train 104 hook 1403')
+    menu('train 104 hook 1404')
+    menu('train 104 hook 1405')
+    menu('train 104 hook 1406')
     
-    self.menu('new train cargo 105 Людиновский ТВСЗ')
-    self.menu('new train passenger 106 Уралтрансмаш')
-    self.menu('new train passenger 107 Уралтрансмаш')
-    self.menu('new van cargo 1501 100')
-    self.menu('new van passenger 1601 100')
+    menu('new train cargo 105 Людиновский ТВСЗ')
+    menu('new train passenger 106 Уралтрансмаш')
+    menu('new train passenger 107 Уралтрансмаш')
+    menu('new van cargo 1501 100')
+    menu('new van passenger 1601 100')
     
-    self.menu('new station Москва')
-    self.menu('new station Питер')
-    self.menu('new station Ростов')
-    self.menu('new station Краснодар')
-    self.menu('new station Сочи')
-    self.menu('new station Адлер')
-    self.menu('new station Абинск')
-    self.menu('new station Крымск')
-    self.menu('new station Новороссийск')
-    self.menu('new station Новокузнецк')
-    self.menu('new station Челябинск')
-    self.menu('new station Крымск')
+    menu('new station Москва')
+    menu('new station Питер')
+    menu('new station Ростов')
+    menu('new station Краснодар')
+    menu('new station Сочи')
+    menu('new station Адлер')
+    menu('new station Абинск')
+    menu('new station Крымск')
+    menu('new station Новороссийск')
+    menu('new station Новокузнецк')
+    menu('new station Челябинск')
+    menu('new station Крымск')
     
-    self.menu('new route Москва;Ростов;Краснодар;Сочи;Адлер')
-    self.menu('new route Москва;Питер')
-    self.menu('new route Краснодар;Абинск;Крымск;Новороссийск')
-    self.menu('new route Краснодар;Сочи;Адлер')
-    self.menu('new route Челябинск;Новокузнецк;Краснодар;Сочи')
+    menu('new route Москва;Ростов;Краснодар;Сочи;Адлер')
+    menu('new route Москва;Питер')
+    menu('new route Краснодар;Абинск;Крымск;Новороссийск')
+    menu('new route Краснодар;Сочи;Адлер')
+    menu('new route Челябинск;Новокузнецк;Краснодар;Сочи')
     
-    self.menu('train 101 route 0')
-    self.menu('train 102-FF route 1')
-    self.menu('train 103 route 2')
-    self.menu('train 105 route 3')
-    self.menu('train 106 route 4')
-    self.menu('train 107 route 5')
+    menu('train 101 route 0')
+    menu('train 102-FF route 1')
+    menu('train 103 route 2')
+    menu('train 105 route 3')
+    menu('train 106 route 4')
+    menu('train 107 route 5')
   
-    3.times { self.menu('train 101 move up') }
-    4.times { self.menu('train 102-FF move up') }
+    3.times { menu('train 101 move up') }
+    4.times { menu('train 102-FF move up') }
   end
 
   def menu(choice)
@@ -551,7 +566,7 @@ class MainCLI
       print PROMT_END
       
       unless choice.nil?
-        break if self.menu(choice)
+        break if menu(choice)
       end
     end
   end

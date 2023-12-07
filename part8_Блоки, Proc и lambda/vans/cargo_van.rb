@@ -26,6 +26,10 @@ class CargoVan < Van
     super + " объем (#{self.volume[:used]}/#{self.volume[:total]})"
   end
 
+  def to_s_simple
+    super + " #{self.volume[:used]}/#{self.volume[:total]}"
+  end
+
   private
   attr_writer :volume
 end
