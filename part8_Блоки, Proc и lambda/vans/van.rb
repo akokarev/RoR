@@ -56,10 +56,6 @@ class Van
   def to_s
     "Вагон #{self.number} #{self.type} by #{self.manufacturer} #{self.train.nil? ? 'отцеплен' : self.train.number}"
   end
-  
-  def to_s_simple
-    "#{self.number} #{self.type}"
-  end
 
   private
   attr_writer :train
