@@ -126,6 +126,14 @@ class Train
     "Поезд \##{self.number} (#{self.type}) by #{self.manufacturer}: скорость #{self.speed}км/ч, вагонов #{self.vans.count}, станция #{self.station}, маршрут #{self.route}"
   end
 
+  def to_s_simple
+    "\##{self.number} #{self.type} #{self.vans.count}"
+  end
+
+  def each
+    self.vans.each { |van| yield(van) }
+  end
+
   private
   attr_writer :vans, :speed, :route, :station
 
