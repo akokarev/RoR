@@ -254,7 +254,7 @@ class MainCLI
     when 'S', 'STATION'
       show_station(choice_arr.join(' '))
     when 'T', 'TRAIN'
-      show_train(choice_arr.first.to_i)
+      show_train(choice_arr.first)
     when 'V', 'VAN'
       show_van(choice_arr.first.to_i)
     when 'R', 'ROUTE'
@@ -421,97 +421,128 @@ class MainCLI
   end
 
   def fill_sample_data
-    t101 = PassengerTrain.new('101', 'Людиновский ТВСЗ')
-    vp1101 = PassengerVan.new(1101, 'Метровагонмаш', 40)
-    vp1102 = PassengerVan.new(1102, 'Метровагонмаш', 44)
-    vp1103 = PassengerVan.new(1103, 'Метровагонмаш', 44)
-    vp1104 = PassengerVan.new(1104, 'Метровагонмаш', 44)
-    vp1105 = PassengerVan.new(1105, 'Метровагонмаш', 44)
-    vp1106 = PassengerVan.new(1106, 'Метровагонмаш', 44)
-    vp1107 = PassengerVan.new(1107, 'Метровагонмаш', 44)
-    vp1108 = PassengerVan.new(1108, 'Метровагонмаш', 42)
-    t101.hook(vp1101)
-    t101.hook(vp1102)
-    t101.hook(vp1103)
-    t101.hook(vp1104)
-    t101.hook(vp1105)
-    t101.hook(vp1106)
-    t101.hook(vp1107)
-    t101.hook(vp1108)
-
-    t102 = PassengerTrain.new('102-01', 'Людиновский ТВСЗ')
-    vp1201 = PassengerVan.new(1201, 'Метровагонмаш', 40)
-    vp1202 = PassengerVan.new(1202, 'Метровагонмаш', 44)
-    vp1203 = PassengerVan.new(1203, 'Метровагонмаш', 44)
-    vp1204 = PassengerVan.new(1204, 'Метровагонмаш', 44)
-    vp1205 = PassengerVan.new(1205, 'Метровагонмаш', 42)
-    t102.hook(vp1201)
-    t102.hook(vp1202)
-    t102.hook(vp1203)
-    t102.hook(vp1204)
-    t102.hook(vp1205)
-
-    t103 = PassengerTrain.new('103', 'Новочеркасский ЭВСЗ')
-    vp1301 = PassengerVan.new(1201, 'Тверской ВСЗ', 64)
-    vp1302 = PassengerVan.new(1202, 'Тверской ВСЗ', 54)
-    vp1303 = PassengerVan.new(1203, 'Тверской ВСЗ', 81)
-    vp1304 = PassengerVan.new(1204, 'Тверской ВСЗ', 36)
-    t103.hook(vp1301)
-    t103.hook(vp1302)
-    t103.hook(vp1303)
-    t103.hook(vp1304)
+    self.menu('new train passenger 101 Людиновский ТВСЗ')
+    self.menu('new van passenger 1101 Метровагонмаш 40')
+    self.menu('new van passenger 1102 Метровагонмаш 44')
+    self.menu('new van passenger 1103 Метровагонмаш 44')
+    self.menu('new van passenger 1104 Метровагонмаш 44')
+    self.menu('new van passenger 1105 Метровагонмаш 44')
+    self.menu('new van passenger 1106 Метровагонмаш 44')
+    self.menu('new van passenger 1107 Метровагонмаш 44')
+    self.menu('new van passenger 1108 Метровагонмаш 42')
+    self.menu('train 101 hook 1101')
+    self.menu('train 101 hook 1102')
+    self.menu('train 101 hook 1103')
+    self.menu('train 101 hook 1104')
+    self.menu('train 101 hook 1105')
+    self.menu('train 101 hook 1106')
+    self.menu('train 101 hook 1107')
+    self.menu('train 101 hook 1108')
+    self.menu('train take 1101 10')
+    self.menu('train take 1102 20')
+    self.menu('train take 1103 1')
+    self.menu('train take 1104 2')
     
-    t104 = CargoTrain.new('104', 'Коломенский завод')
-    vc1401 = CargoVan.new(1401, 'Канашский ВРЗ', 80)
-    vc1402 = CargoVan.new(1402, 'Канашский ВРЗ', 80)
-    vc1403 = CargoVan.new(1403, 'Канашский ВРЗ', 60)
-    vc1404 = CargoVan.new(1404, 'Канашский ВРЗ', 60)
-    vc1405 = CargoVan.new(1405, 'Канашский ВРЗ', 80)
-    vc1406 = CargoVan.new(1406, 'Канашский ВРЗ', 80)
-    t104.hook(vc1401)
-    t104.hook(vc1402)
-    t104.hook(vc1403)
-    t104.hook(vc1404)
-    t104.hook(vc1405)
-    t104.hook(vc1406)
-
-    t105 = CargoTrain.new('105', 'Людиновский ТВСЗ')
-    t106 = CargoTrain.new('106', 'Уралтрансмаш')
-
-    st1 = Station.new('Москва')
-    st2 = Station.new('Питер')
-    st3 = Station.new('Ростов')
-    st4 = Station.new('Краснодар')
-    st5 = Station.new('Сочи')
-    st6 = Station.new('Адлер')
-    st7 = Station.new('Абинск')
-    st8 = Station.new('Крымск')
-    st9 = Station.new('Новокузнецк')
-    st10 = Station.new('Новороссийск')
-    st11 = Station.new('Челябинск')
-
-    r1 = Route.new(st1,st6)
-    r1.add(st2)
-    r1.add(st3)
-    r1.add(st4)
-    r1.add(st5)
-
-    r2 = Route.new(st1,st10)
-    r1.add(st2)
-    r1.add(st3)
-    r1.add(st4)
-    r1.add(st7)
-    r1.add(st8)
+    self.menu('new train passenger 102-FF Людиновский ТВСЗ')
+    self.menu('new van passenger 1201 Метровагонмаш 40')
+    self.menu('new van passenger 1202 Метровагонмаш 44')
+    self.menu('new van passenger 1203 Метровагонмаш 44')
+    self.menu('new van passenger 1204 Метровагонмаш 44')
+    self.menu('new van passenger 1205 Метровагонмаш 44')
+    self.menu('new van passenger 1206 Метровагонмаш 44')
+    self.menu('new van passenger 1207 Метровагонмаш 44')
+    self.menu('new van passenger 1208 Метровагонмаш 42')
     
-    t101.set_route(r1)
-    t102.set_route(r1)
-    t103.set_route(r2)
+    self.menu('train 102-FF hook 1201')
+    self.menu('train 102-FF hook 1202')
+    self.menu('train 102-FF hook 1203')
+    self.menu('train 102-FF hook 1204')
+    self.menu('train 102-FF hook 1205')
+    self.menu('train 102-FF hook 1206')
+    self.menu('train 102-FF hook 1207')
+    self.menu('train 102-FF hook 1208')
 
-    3.times { t103.move_up }
-    4.times { t104.set_route(r2)}
+    self.menu('new train passenger 103 Новочеркасский ЭВСЗ')
+    self.menu('new van passenger 1301 Тверской ВСЗ 64')
+    self.menu('new van passenger 1302 Тверской ВСЗ 54')
+    self.menu('new van passenger 1303 Тверской ВСЗ 81')
+    self.menu('new van passenger 1304 Тверской ВСЗ 36')
+    self.menu('train 103 hook 1301')
+    self.menu('train 103 hook 1302')
+    self.menu('train 103 hook 1303')
+    self.menu('train 103 hook 1304')
     
-    t105.set_station(st11)
-    t106.set_station(st3)
+    self.menu('new train cargo 104 Коломенский завод')
+    self.menu('new van cargo 1401 Канашский ВРЗ 80')
+    self.menu('new van cargo 1402 Канашский ВРЗ 60')
+    self.menu('new van cargo 1403 Канашский ВРЗ 60')
+    self.menu('new van cargo 1404 Канашский ВРЗ 40')
+    self.menu('new van cargo 1405 Канашский ВРЗ 40')
+    self.menu('new van cargo 1406 Канашский ВРЗ 40')
+    
+    self.menu('train 104 hook 1401')
+    self.menu('train 104 hook 1402')
+    self.menu('train 104 hook 1403')
+    self.menu('train 104 hook 1404')
+    self.menu('train 104 hook 1405')
+    self.menu('train 104 hook 1406')
+    
+    self.menu('new train cargo 105 Людиновский ТВСЗ')
+    self.menu('new train passenger 106 Уралтрансмаш')
+    self.menu('new train passenger 107 Уралтрансмаш')
+    self.menu('new van cargo 1501 100')
+    self.menu('new van passenger 1601 100')
+    
+    self.menu('new station Москва')
+    self.menu('new station Питер')
+    self.menu('new station Ростов')
+    self.menu('new station Краснодар')
+    self.menu('new station Сочи')
+    self.menu('new station Адлер')
+    self.menu('new station Абинск')
+    self.menu('new station Крымск')
+    self.menu('new station Новороссийск')
+    self.menu('new station Новокузнецк')
+    self.menu('new station Челябинск')
+    self.menu('new station Крымск')
+    
+    self.menu('new route Москва;Ростов;Краснодар;Сочи;Адлер')
+    self.menu('new route Москва;Питер')
+    self.menu('new route Краснодар;Абинск;Крымск;Новороссийск')
+    self.menu('new route Краснодар;Сочи;Адлер')
+    self.menu('new route Челябинск;Новокузнецк;Краснодар;Сочи')
+    
+    self.menu('train 101 route 0')
+    self.menu('train 102-FF route 1')
+    self.menu('train 103 route 2')
+    self.menu('train 105 route 3')
+    self.menu('train 106 route 4')
+    self.menu('train 107 route 5')
+  
+    3.times { self.menu('train 101 move up') }
+    4.times { self.menu('train 102-FF move up') }
+  end
+
+  def menu(choice)
+    choice_arr = choice.split(' ')
+    
+    if choice_arr.count >= 1
+      choice_current = choice_arr.shift.upcase
+      case choice_current
+      when 'E', 'EXIT'    then return true
+      when 'H', 'HELP'    then show_help
+      when 'N', 'NEW'     then menu_new(choice_arr)
+      when 'S', 'SHOW'    then menu_show(choice_arr)
+      when 'L', 'LIST'    then menu_list(choice_arr)
+      when 'D', 'DELETE'  then menu_delete(choice_arr)
+      when 'T', 'TRAIN'   then menu_train(choice_arr)
+      when 'R', 'ROUTE'   then menu_route(choice_arr)
+      when 'F', 'FILL'    then fill_sample_data
+      else
+        puts ERROR_WRONG_COMMAND
+      end
+    end
+    false
   end
 
   def start()
@@ -520,24 +551,7 @@ class MainCLI
       print PROMT_END
       
       unless choice.nil?
-        choice_arr = choice.split(' ')
-        
-        if choice_arr.count >= 1
-          choice_current = choice_arr.shift.upcase
-          case choice_current
-          when 'E', 'EXIT'    then break
-          when 'H', 'HELP'    then show_help
-          when 'N', 'NEW'     then menu_new(choice_arr)
-          when 'S', 'SHOW'    then menu_show(choice_arr)
-          when 'L', 'LIST'    then menu_list(choice_arr)
-          when 'D', 'DELETE'  then menu_delete(choice_arr)
-          when 'T', 'TRAIN'   then menu_train(choice_arr)
-          when 'R', 'ROUTE'   then menu_route(choice_arr)
-          when 'F', 'FILL'    then fill_sample_data
-          else
-            puts ERROR_WRONG_COMMAND
-          end
-        end
+        break if self.menu(choice)
       end
     end
   end
@@ -558,10 +572,5 @@ while !normal_exit do
     puts e.inspect
     puts e.backtrace
     retry
-  ensure
-    puts "=========================="
-    pp menu
-    puts "=========================="
-    pp Train.all
   end
 end
