@@ -122,14 +122,6 @@ class Train
     self.route.stations[self.route.stations.index(self.station)-1]
   end
 
-  def to_s
-    raise 'Method deprecated'
-  end
-
-  def to_s_simple
-    raise 'Method deprecated'
-  end
-
   def vans_info
     self.vans.each { |van| yield(van) }
   end
