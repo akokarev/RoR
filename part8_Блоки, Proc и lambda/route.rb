@@ -29,7 +29,7 @@ class Route
   end
 
   def to_s
-     "[#{self.stations.join '-'}]"
+     raise 'Deprecated'
   end
 
 end

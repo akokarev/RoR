@@ -123,14 +123,14 @@ class Train
   end
 
   def to_s
-    "Поезд \##{self.number} (#{self.type}) by #{self.manufacturer}: скорость #{self.speed}км/ч, вагонов #{self.vans.count}, станция #{self.station}, маршрут #{self.route}"
+    raise 'Method deprecated'
   end
 
   def to_s_simple
-    "\##{self.number} #{self.type} #{self.vans.count}"
+    raise 'Method deprecated'
   end
 
-  def each
+  def vans_info
     self.vans.each { |van| yield(van) }
   end
 

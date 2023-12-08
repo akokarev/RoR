@@ -8,7 +8,7 @@ class PassengerVan < Van
 
   def initialize(number, manufacturer = nil, seats_count)
     raise "Количество мест должно быть указано" if seats_count.nil?
-    @seats = {:total => seats_count, :used => 0 }
+    @seats = {total: seats_count, used: 0 }
     super(number, manufacturer)
   end
 
@@ -16,18 +16,20 @@ class PassengerVan < Van
     self.seats[:total] - self.seats[:used]
   end
 
-  def take_seats(seats_add = 1)
-    can_be_added = (self.free_seats > seats_add) ? seats_add : self.free_seats
-    self.seats[:used] += can_be_added
-    [can_be_added, seats_add - can_be_added]
+  def used_seats
+    self.seats[:used]
   end
 
-  def to_s
-    super + " мест (#{self.seats[:used]}/#{self.seats[:total]})"
+  def total_seats
+    self.seats[:total]
   end
 
-  def to_s_simple
-    super + " #{self.seats[:used]}/#{self.seats[:total]}"
+  def take_seat
+    if self.free_seats >= 1
+      self.seats[:used] += 1
+    else
+      raise 'Нет свободных мест'
+    end
   end
 
   private

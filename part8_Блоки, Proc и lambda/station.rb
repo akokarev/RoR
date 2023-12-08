@@ -64,11 +64,7 @@ class Station
     self.trains.select {|t| t.type == type}
   end
 
-  def to_s
-    self.name
-  end
-
-  def each
+  def trains_info
     self.trains.each { |train| yield(train) }
   end
 

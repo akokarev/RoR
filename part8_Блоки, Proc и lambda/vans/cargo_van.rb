@@ -16,18 +16,20 @@ class CargoVan < Van
     self.volume[:total] - self.volume[:used]
   end
 
+  def used_volume
+    self.volume[:used]
+  end
+
+  def total_volume
+    self.volume[:total]
+  end
+
   def take_volume(volume_add)
-    can_be_added = (self.free_volume > volume_add) ? volume_add : self.free_volume
-    self.volume[:used] += can_be_added
-    [can_be_added, volume_add - can_be_added]
-  end
-
-  def to_s
-    super + " объем (#{self.volume[:used]}/#{self.volume[:total]})"
-  end
-
-  def to_s_simple
-    super + " #{self.volume[:used]}/#{self.volume[:total]}"
+    if self.free_volume >= volume_add
+      self.volume[:used] += volume_add
+    else
+      raise 'Недостаточно свободного объема в вагоне'
+    end
   end
 
   private
