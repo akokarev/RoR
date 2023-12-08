@@ -118,6 +118,42 @@ class MainCLI
     puts "  #{col_command 'exit'}    #{col_comment 'Выход'}"
   end
 
+  def represent_train(train)
+    str = "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{train.station}, маршрут #{train.route}"
+  end
+
+  def represent_train_simple(train)
+    str =  "\##{train.number} #{train.type} #{train.vans.count}"
+  end
+
+  def represent_van(van)
+    str = "Вагон #{van.number} #{van.type} by #{van.manufacturer} #{van.train.nil? ? 'отцеплен' : van.train.number}"
+    case van.type
+    when :cargo
+      str += " объем (#{van.volume[:used]}/#{van.volume[:total]})"
+    when :passenger
+      str += " мест (#{van.seats[:used]}/#{van.seats[:total]})"
+    end
+  end
+
+  def represent_van_simple(van)
+    str = "#{van.number} #{van.type}"
+    case van.type
+    when :cargo
+      str += " #{van.volume[:used]}/#{van.volume[:total]}"
+    when :passenger
+      str += " #{van.seats[:used]}/#{van.seats[:total]}"
+    end
+  end
+
+  def represent_station(station)
+    station.name
+  end
+
+  def represent_route(route)
+    "[#{route.stations.map{ |st| st.name }.join '-'}]"
+  end
+
   def new_train(number, type, manufacturer = nil)
     case type 
     when :cargo
@@ -125,7 +161,7 @@ class MainCLI
     when :passenger
       PassengerTrain.new(number, manufacturer)
     end
-    puts "\##{Train.all.count-1}: #{Train.all.last}"
+    puts "\##{Train.all.count-1}: #{represent_train(Train.all.last)}"
   end
 
   def new_van(number, type, manufacturer = nil, total)
@@ -133,7 +169,7 @@ class MainCLI
     when :cargo then vans << CargoVan.new(number, manufacturer, total)
     when :passenger then vans << PassengerVan.new(number, manufacturer, total)
     end
-    puts "\##{vans.count-1}: #{vans.last}"
+    puts "\##{vans.count-1}: #{represent_van(vans.last)}"
   end
 
   def new_route(stations_names)
@@ -144,13 +180,13 @@ class MainCLI
       stations_names[1..-2].each { |st_name| route.add(Station.all.select{ |station| station.name == st_name }.first) }   
     end
     routes << route
-    puts "\##{routes.count-1}: #{routes.last}"    
+    puts "\##{routes.count-1}: #{represent_route(routes.last)}"    
   end
 
   def show_station(name)
     station = Station.all.select{ |station| station.name==name}.first
     puts "=#{station}="
-    station.trains.each { |train| puts train}
+    station.trains.each { |train| puts represent_train(train)}
   end
 
   def show_train(number)
@@ -159,13 +195,13 @@ class MainCLI
       puts ERROR_WRONG_TRAIN
       return
     end
-    puts "=#{train}="
-    train.vans.each { |van| puts van }
+    puts "=#{represent_train(train)}="
+    train.vans.each { |van| puts represent_van(van) }
   end
 
   def show_van(number)
     van = vans.select{| van| van.number==number}.first
-    puts van
+    puts represent_train(van)
   end
 
 
@@ -174,7 +210,7 @@ class MainCLI
     if choice_arr.count >= 1
       station_name=choice_arr.join(' ')
       station = Station.new(station_name)
-      puts "\##{Station.all.count-1}: #{station}"
+      puts "\##{Station.all.count-1}: #{represent_station(station)}"
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -251,11 +287,11 @@ class MainCLI
 
   def show_all
     Station.all.each do |station|
-      puts "===[#{station.name}]==="
-      station.each do |train|
-        puts "  Поезд №#{train.to_s_simple}"
-        train.each do |van|
-          puts "    Вагон №#{van.to_s_simple}"
+      puts "===[#{represent_station(station)}]==="
+      station.trains_info do |train|
+        puts "  #{represent_train_simple(train)}"
+        train.vans_info do |van|
+          puts "    #{represent_van(van)}"
         end
       end
     end
@@ -271,7 +307,7 @@ class MainCLI
     when 'V', 'VAN'
       show_van(choice_arr.first.to_i)
     when 'R', 'ROUTE'
-      puts routes[(choice_arr.first.to_i)]
+      puts represent_route(routes[(choice_arr.first.to_i)])
     when 'A', 'ALL'
       show_all
     else
@@ -282,13 +318,13 @@ class MainCLI
   def menu_list(choice_arr)
     case choice_arr.first.upcase
     when 'S', 'STATIONS'
-      Station.all.each { |st| puts st}
+      Station.all.each { |st| puts represent_station(st)}
     when 'T', 'TRAINS'
-      Train.all.each { |tr| puts tr} 
+      Train.all.each { |tr| puts represent_train(tr)} 
     when 'V', 'VANS'
-      vans.each { |vn| puts vn}
+      vans.each { |vn| puts represent_van(vn)}
     when 'R', 'ROUTES'
-      routes.each_with_index { |rt, n| puts "#{n} #{rt}" }
+      routes.each_with_index { |rt, n| puts "#{n} #{represent_route(rt)}" }
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -347,15 +383,15 @@ class MainCLI
     case direction
     when 'U', 'UP'
       train.move_up
-      puts "Поезд №#{train.number} на станции #{train.station}"
+      puts "Поезд №#{train.number} на станции #{represent_station(train.station)}"
     when 'D', 'DOWN' 
       train.move_down
-      puts "Поезд №#{train.number} на станции #{train.station}"
+      puts "Поезд №#{train.number} на станции #{represent_station(train.station)}"
     when 'S', 'STATION'
       st_name = choice_arr.join(' ')
       station = Station.all.select { |station| station.name == st_name }.first
       train.set_station(station)
-      puts "Поезд №#{train.number} прибыл на станцию #{station}"
+      puts "Поезд №#{train.number} прибыл на станцию #{represent_station(station)})"
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -374,13 +410,28 @@ class MainCLI
     unless van.nil?
       case van.type
       when :passenger
-        taked = van.take_seats(count)
-        puts "Занято мест: #{taked[0]}"
-        puts "Не хватило мест: #{taked[1]}" if taked[1]>0
+        used_before = van.used_seats
+        begin
+          count.times { van.take_seat }
+        rescue
+          deficit = true
+        end
+        used_after = van.used_seats
+        taked = used_after - used_before
+        puts "Занято мест: #{taked}"
+        puts "Не хватило мест: #{count - taked}" if deficit
+
       when :cargo
-        taked = van.take_volume(count)
-        puts "Занят объем: #{taked[0]}"
-        puts "Не поместилось: #{taked[1]}" if taked[1]>0
+        used_before = van.used_volume
+        begin
+          van.take_volume(count)
+          used_after = van.used_volume
+          taked = used_after - used_before
+          puts "Занят объем: #{taked}"
+        rescue
+          oversize = count - van.used_volume
+          puts "Не удалось разместить груз, недостаточно #{oversize}"
+        end
       else
         puts ERROR_WRONG_VAN_TYPE
       end
@@ -429,7 +480,7 @@ class MainCLI
     case choice_current
     when 'A', 'ADD'    
       menu_route_add(route, choice_arr.join(' '))
-      puts route
+      puts represent_route(route)
     else
       puts ERROR_WRONG_COMMAND
     end

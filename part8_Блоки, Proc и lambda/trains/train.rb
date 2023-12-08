@@ -122,8 +122,8 @@ class Train
     self.route.stations[self.route.stations.index(self.station)-1]
   end
 
-  def to_s
-    "Поезд \##{self.number} (#{self.type}) by #{self.manufacturer}: скорость #{self.speed}км/ч, вагонов #{self.vans.count}, станция #{self.station}, маршрут #{self.route}"
+  def vans_info
+    self.vans.each { |van| yield(van) }
   end
 
   def to_s_simple

@@ -53,15 +53,6 @@ class Van
     old_train.unhook(self) if old_train.vans.include?(self)
   end
 
-  def to_s
-    "Вагон #{self.number} #{self.type} by #{self.manufacturer} #{self.train.nil? ? 'отцеплен' : self.train.number}"
-  end
-  
-  def to_s_simple
-    "#{self.number} #{self.type}"
-  end
-
   private
   attr_writer :train
-
 end
