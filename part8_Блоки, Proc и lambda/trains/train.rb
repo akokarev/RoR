@@ -126,6 +126,14 @@ class Train
     self.vans.each { |van| yield(van) }
   end
 
+  def to_s_simple
+    "\##{self.number} #{self.type} #{self.vans.count}"
+  end
+
+  def each
+    self.vans.each { |van| yield(van) }
+  end
+
   private
   attr_writer :vans, :speed, :route, :station
 

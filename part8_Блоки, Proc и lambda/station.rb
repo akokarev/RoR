@@ -68,6 +68,10 @@ class Station
     self.trains.each { |train| yield(train) }
   end
 
+  def each
+    self.trains.each { |train| yield(train) }
+  end
+
   private 
   attr_writer :trains
 
