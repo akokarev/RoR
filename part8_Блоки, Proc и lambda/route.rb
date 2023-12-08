@@ -27,9 +27,4 @@ class Route
   def remove(old_station)
     self.stations.delete(old_station)
   end
-
-  def to_s
-     raise 'Deprecated'
-  end
-
 end

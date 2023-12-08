@@ -55,5 +55,4 @@ class Van
 
   private
   attr_writer :train
-
 end
