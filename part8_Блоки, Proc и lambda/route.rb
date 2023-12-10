@@ -3,8 +3,8 @@ class Route
 
   def validate!
     stations.each do |station|
-      raise 'Станция должна быть типа Station' unless station.kind_of? Station
-      raise 'Станции в маршруте должны быть валидные' unless station.valid?
+      raise TypeError, 'Станция должна быть типа Station' unless station.kind_of? Station
+      raise InvalidStation, 'Станции в маршруте должны быть валидные' unless station.valid?
     end
   end
 

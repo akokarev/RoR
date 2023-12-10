@@ -13,11 +13,11 @@ class Station
   def validate!(recur=false)
 #    raise 'Название станции должно быть строка' unless self.name.kind_of? String
 #    raise 'Название станции не может быть пустым' if self.name.length == 0
-    raise 'Название станции должно состоять из русских и английских букв, цифр' if name !~ /\A[\p{Cyrillic} \w]+\z/
+    raise InvalidStationName, 'Название станции должно состоять из русских и английских букв, цифр' if name !~ /\A[\p{Cyrillic} \w]+\z/
 
     trains.each do |train| 
-      raise "Поезда должны происходить от Train: #{train.inspect}" unless train.class.ancestors.include? Train
-      raise "Поезда на станции должны быть валидными" unless recur || train.valid?(true)
+      raise TypeError, 'Поезда должны происходить от Train' unless train.class.ancestors.include? Train
+      raise InvalidTrain, 'Поезда на станции должны быть валидными' unless recur || train.valid?(true)
     end
   end
 

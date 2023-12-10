@@ -1,5 +1,6 @@
 require_relative '../vans/van.rb'
 require_relative '../modules/manufacturer.rb'
+require_relative '../exceptions.rb'
 class Train
   include Manufacturer
   attr_reader :number, :vans, :speed, :route, :station
@@ -21,20 +22,20 @@ class Train
   end
 
   def validate_van!(van, recur = false)
-    raise 'Вагон должен быть наследником класса Van' unless van.kind_of? Van
-    raise 'Тип вагона не соответсвует типу поезда' unless type == van.type
-    raise 'Вагон должен быть валидным' unless recur || van.valid?(true)
+    raise TypeError, 'Вагон должен быть наследником класса Van' unless van.kind_of? Van
+    raise DifferentTypes, 'Тип вагона не соответсвует типу поезда' unless type == van.type
+    raise InvalidVan, 'Вагон должен быть валидным' unless recur || van.valid?(true)
   end
   
   def validate!(recur=false)
-    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if number !~ /\A[\w\p{Cyrillic}]{3}(-[\w\p{Cyrillic}]{2}){0,1}\z/ 
-    raise 'Производитель строка минимум 3 символа' if manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
+    raise InvalidTrainNumber, 'Номер поезда должен быть в формате 1ЯZ-2X' if number !~ /\A[\w\p{Cyrillic}]{3}(-[\w\p{Cyrillic}]{2}){0,1}\z/ 
+    raise InvalidManufacturer, 'Производитель строка минимум 3 символа' if manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
     vans.each { |van| validate_van!(van, recur) }
-    #bug
+    #TODO
     #Если инициатор проверки вагон прицепленный к поезду, то будет проверен поезд, но не маршрут и не станция
     #Нужен более глубокий анализ recur, например recur = {:train => true; :station=>false; :route => false}
-    raise 'Если указан, маршрут должен быть валидным' unless route.nil? || recur || route.valid?(true)
-    raise 'Если указана, станция должна быть валидная' unless station.nil? || recur || station.valid?(true)
+    raise InvalidRoute, 'Если указан, маршрут должен быть валидным' unless route.nil? || recur || route.valid?(true)
+    raise InvalidStation, 'Если указана, станция должна быть валидная' unless station.nil? || recur || station.valid?(true)
   end
 
   def valid?(recur = false)
@@ -81,18 +82,18 @@ class Train
   end
 
   def hook(new_van)
-    raise 'Вагон должен быть указан' unless new_van.kind_of? Van
-    raise 'Тип поезда не соответсвует типу вагона' unless type == new_van.type
-    raise 'Вагон нельзя прицепить дважды' if vans.include?(new_van)
-    raise 'Нельзя прицепить вагон во время движения поезда' unless speed == 0
+    raise InvalidVan, 'Вагон должен быть указан' unless new_van.kind_of? Van
+    raise DifferentTypes, 'Тип поезда не соответсвует типу вагона' unless type == new_van.type
+    raise VanDoubleHooked, 'Вагон нельзя прицепить дважды' if vans.include?(new_van)
+    raise TrainMoving, 'Нельзя прицепить вагон во время движения поезда' unless speed == 0
 
     self.vans << new_van
     new_van.hook(self) unless new_van.train == self
   end
 
   def unhook(old_van)
-    raise 'Вагон не был прицеплен' unless vans.include?(old_van) 
-    raise 'Нельзя отцепить вагон во время движения поезда' unless speed == 0
+    raise VanNotHooked, 'Вагон не был прицеплен' unless vans.include?(old_van) 
+    raise TrainMoving, 'Нельзя отцепить вагон во время движения поезда' unless speed == 0
     vans.delete(old_van)
     old_van.unhook if old_van.train == self
   end

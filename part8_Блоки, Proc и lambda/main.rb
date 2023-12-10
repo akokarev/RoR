@@ -6,6 +6,7 @@ require_relative 'trains/passenger_train.rb'
 require_relative 'vans/van.rb'
 require_relative 'vans/cargo_van.rb'
 require_relative 'vans/passenger_van.rb'
+require_relative 'exceptions.rb'
 
 class MainCLI
   attr_accessor :vans, :routes
@@ -119,11 +120,11 @@ class MainCLI
   end
 
   def represent_train(train)
-    "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{train.station}, маршрут #{train.route}"
+    train.nil?? '<не указан>' : "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{represent_station(train.station)}, маршрут #{represent_route(train.route)}"
   end
 
   def represent_train_simple(train)
-    "\##{train.number} #{train.type} #{train.vans.count}"
+    train.nil?? 'не указан' : "\##{train.number} #{train.type} #{train.vans.count}"
   end
 
   def represent_van(van)
@@ -147,11 +148,11 @@ class MainCLI
   end
 
   def represent_station(station)
-    station.name
+    station.nil?? '<в пути>' : station.name
   end
 
   def represent_route(route)
-    "[#{route.stations.map{ |st| st.name }.join '-'}]"
+    route.nil?? '<маршрут не назначен>' : "[#{route.stations.map{ |st| st.name }.join '-'}]"
   end
 
   def new_train(number, type, manufacturer = nil)
@@ -185,7 +186,7 @@ class MainCLI
 
   def show_station(name)
     station = Station.all.select{ |station| station.name==name}.first
-    puts "=#{station}="
+    puts "=#{represent_station(station)}="
     station.trains.each { |train| puts represent_train(train)}
   end
 
@@ -420,19 +421,15 @@ class MainCLI
         rescue NotEnoughFreeSeats
           deficit = true
         end
-        used_after = van.used_seats
         puts "Занято мест: #{taked}"
         puts "Не хватило мест: #{count - taked}" if deficit
 
       when :cargo
-        used_before = van.used_volume
         begin
           van.take_volume(count)
-          used_after = van.used_volume
-          taked = used_after - used_before
-          puts "Занят объем: #{taked}"
-        rescue NotEnoughFreeSpace
-          oversize = count - van.used_volume
+          puts "Занят объем: #{count}"
+        rescue NotEnoughFreeVolume
+          oversize = count - van.free_volume
           puts "Не удалось разместить груз, недостаточно #{oversize}"
         end
       else
