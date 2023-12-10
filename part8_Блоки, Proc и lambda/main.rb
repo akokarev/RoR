@@ -119,11 +119,11 @@ class MainCLI
   end
 
   def represent_train(train)
-    str = "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{train.station}, маршрут #{train.route}"
+    "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{train.station}, маршрут #{train.route}"
   end
 
   def represent_train_simple(train)
-    str =  "\##{train.number} #{train.type} #{train.vans.count}"
+    "\##{train.number} #{train.type} #{train.vans.count}"
   end
 
   def represent_van(van)
@@ -201,7 +201,7 @@ class MainCLI
 
   def show_van(number)
     van = vans.select{| van| van.number==number}.first
-    puts represent_train(van)
+    puts represent_van(van)
   end
 
 
@@ -410,14 +410,17 @@ class MainCLI
     unless van.nil?
       case van.type
       when :passenger
+        taked = 0
         used_before = van.used_seats
         begin
-          count.times { van.take_seat }
-        rescue
+          count.times do 
+            van.take_seat
+            taked += 1
+          end
+        rescue NotEnoughFreeSeats
           deficit = true
         end
         used_after = van.used_seats
-        taked = used_after - used_before
         puts "Занято мест: #{taked}"
         puts "Не хватило мест: #{count - taked}" if deficit
 
@@ -428,7 +431,7 @@ class MainCLI
           used_after = van.used_volume
           taked = used_after - used_before
           puts "Занят объем: #{taked}"
-        rescue
+        rescue NotEnoughFreeSpace
           oversize = count - van.used_volume
           puts "Не удалось разместить груз, недостаточно #{oversize}"
         end

@@ -11,15 +11,15 @@ class Van
   def validate_train!(train, recur = false)
     unless train.nil?
       raise 'Поезд должен быть наследником класса Train' unless train.kind_of? Train
-      raise 'Тип вагона не соответсвует типу поезда' unless self.type == train.type
+      raise 'Тип вагона не соответсвует типу поезда' unless type == train.type
       raise 'Поезд должен быть валидным' unless recur || train.valid?(true)
     end
   end
 
   def validate!(recur = false)
-    raise 'Номер вагона целое число больше нуля' unless self.number.kind_of?(Integer) && self.number > 0
-    raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
-    validate_train!(self.train, recur)
+    raise 'Номер вагона целое число больше нуля' unless number.kind_of?(Integer) && number > 0
+    raise 'Производитель строка минимум 3 символа' if manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
+    validate_train!(train, recur)
   end
 
   def valid?(recur = false)
@@ -38,17 +38,17 @@ class Van
 
   def hook(new_train)
     validate_train!(new_train)
-    raise 'Вагон нельзя прицепить дважды' unless self.train.nil?
+    raise 'Вагон нельзя прицепить дважды' unless train.nil?
     raise 'Нельзя прицепить вагон во время движения поезда' unless new_train.speed == 0
 
     self.train = new_train
-    self.train.hook(self) unless self.train.vans.include?(self)
+    train.hook(self) unless train.vans.include?(self)
   end
 
   def unhook
-    raise 'Нельзя отцепить отцепленный вагон' if self.train == nil
-    raise 'Нельзя отцепить вагон во время движения поезда' unless self.train.speed == 0
-    old_train = self.train
+    raise 'Нельзя отцепить отцепленный вагон' if train == nil
+    raise 'Нельзя отцепить вагон во время движения поезда' unless train.speed == 0
+    old_train = train
     self.train = nil
     old_train.unhook(self) if old_train.vans.include?(self)
   end

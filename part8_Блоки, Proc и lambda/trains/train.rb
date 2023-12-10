@@ -22,19 +22,19 @@ class Train
 
   def validate_van!(van, recur = false)
     raise 'Вагон должен быть наследником класса Van' unless van.kind_of? Van
-    raise 'Тип вагона не соответсвует типу поезда' unless self.type == van.type
+    raise 'Тип вагона не соответсвует типу поезда' unless type == van.type
     raise 'Вагон должен быть валидным' unless recur || van.valid?(true)
   end
   
   def validate!(recur=false)
-    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if self.number !~ /\A[\w\p{Cyrillic}]{3}(-[\w\p{Cyrillic}]{2}){0,1}\z/ 
-    raise 'Производитель строка минимум 3 символа' if self.manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
-    self.vans.each { |van| validate_van!(van, recur) }
+    raise 'Номер поезда должен быть в формате 1ЯZ-2X' if number !~ /\A[\w\p{Cyrillic}]{3}(-[\w\p{Cyrillic}]{2}){0,1}\z/ 
+    raise 'Производитель строка минимум 3 символа' if manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
+    vans.each { |van| validate_van!(van, recur) }
     #bug
     #Если инициатор проверки вагон прицепленный к поезду, то будет проверен поезд, но не маршрут и не станция
     #Нужен более глубокий анализ recur, например recur = {:train => true; :station=>false; :route => false}
-    raise 'Если указан, маршрут должен быть валидным' unless self.route.nil? || recur || self.route.valid?(true)
-    raise 'Если указана, станция должна быть валидная' unless self.station.nil? || recur || self.station.valid?(true)
+    raise 'Если указан, маршрут должен быть валидным' unless route.nil? || recur || route.valid?(true)
+    raise 'Если указана, станция должна быть валидная' unless station.nil? || recur || station.valid?(true)
   end
 
   def valid?(recur = false)
@@ -59,7 +59,7 @@ class Train
   end
 
   def set_station(new_station)
-    if self.station != new_station
+    if station != new_station
       old_station = self.station
       self.station = new_station
       old_station.depart(self) if old_station
@@ -73,7 +73,7 @@ class Train
 
   def slow(delta_speed)
     self.speed -= delta_speed if delta_speed > 0
-    stop if self.speed < 0
+    stop if speed < 0
   end
 
   def stop
@@ -82,18 +82,18 @@ class Train
 
   def hook(new_van)
     raise 'Вагон должен быть указан' unless new_van.kind_of? Van
-    raise 'Тип поезда не соответсвует типу вагона' unless self.type == new_van.type
-    raise 'Вагон нельзя прицепить дважды' if self.vans.include?(new_van)
-    raise 'Нельзя прицепить вагон во время движения поезда' unless self.speed == 0
+    raise 'Тип поезда не соответсвует типу вагона' unless type == new_van.type
+    raise 'Вагон нельзя прицепить дважды' if vans.include?(new_van)
+    raise 'Нельзя прицепить вагон во время движения поезда' unless speed == 0
 
     self.vans << new_van
     new_van.hook(self) unless new_van.train == self
   end
 
   def unhook(old_van)
-    raise 'Вагон не был прицеплен' unless self.vans.include?(old_van) 
-    raise 'Нельзя отцепить вагон во время движения поезда' unless self.speed == 0
-    self.vans.delete(old_van)
+    raise 'Вагон не был прицеплен' unless vans.include?(old_van) 
+    raise 'Нельзя отцепить вагон во время движения поезда' unless speed == 0
+    vans.delete(old_van)
     old_van.unhook if old_van.train == self
   end
 
@@ -103,38 +103,35 @@ class Train
   end
 
   def move_up
-    if self.route && self.station != self.route.stations.last
+    if route && station != route.stations.last
       set_station(next_station)
     end
   end
 
   def move_down
-    if self.route && self.station != self.route.stations.first
+    if route && station != route.stations.first
       set_station(prev_station)
     end
   end
 
   def next_station
-    self.route.stations[self.route.stations.index(self.station)+1]
+    route.stations[route.stations.index(station)+1]
   end    
 
   def prev_station
-    self.route.stations[self.route.stations.index(self.station)-1]
+    route.stations[route.stations.index(station)-1]
   end
 
   def vans_info
-    self.vans.each { |van| yield(van) }
+    vans.each { |van| yield(van) }
   end
 
   def to_s_simple
-    "\##{self.number} #{self.type} #{self.vans.count}"
-  end
-
-  def each
-    self.vans.each { |van| yield(van) }
+    "\##{number} #{type} #{vans.count}"
   end
 
   private
   attr_writer :vans, :speed, :route, :station
 
 end
+  

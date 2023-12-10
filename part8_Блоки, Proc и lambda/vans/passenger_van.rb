@@ -13,23 +13,20 @@ class PassengerVan < Van
   end
 
   def free_seats
-    self.seats[:total] - self.seats[:used]
+    seats[:total] - seats[:used]
   end
 
   def used_seats
-    self.seats[:used]
+    seats[:used]
   end
 
   def total_seats
-    self.seats[:total]
+    seats[:total]
   end
 
   def take_seat
-    if self.free_seats >= 1
-      self.seats[:used] += 1
-    else
-      raise 'Нет свободных мест'
-    end
+    raise NotEnoughFreeSeats, 'Нет свободных мест' if free_seats == 0
+    self.seats[:used] += 1
   end
 
   private

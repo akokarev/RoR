@@ -13,23 +13,20 @@ class CargoVan < Van
   end
 
   def free_volume
-    self.volume[:total] - self.volume[:used]
+    volume[:total] - volume[:used]
   end
 
   def used_volume
-    self.volume[:used]
+    volume[:used]
   end
 
   def total_volume
-    self.volume[:total]
+    volume[:total]
   end
 
   def take_volume(volume_add)
-    if self.free_volume >= volume_add
-      self.volume[:used] += volume_add
-    else
-      raise 'Недостаточно свободного объема в вагоне'
-    end
+    raise NotEnoughFreeSpace, 'Нет свободного места' if free_volume <= volume_add
+    self.volume[:used] += volume_add
   end
 
   private

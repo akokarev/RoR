@@ -13,9 +13,9 @@ class Station
   def validate!(recur=false)
 #    raise 'Название станции должно быть строка' unless self.name.kind_of? String
 #    raise 'Название станции не может быть пустым' if self.name.length == 0
-    raise 'Название станции должно состоять из русских и английских букв, цифр' if self.name !~ /\A[\p{Cyrillic} \w]+\z/
+    raise 'Название станции должно состоять из русских и английских букв, цифр' if name !~ /\A[\p{Cyrillic} \w]+\z/
 
-    self.trains.each do |train| 
+    trains.each do |train| 
       raise "Поезда должны происходить от Train: #{train.inspect}" unless train.class.ancestors.include? Train
       raise "Поезда на станции должны быть валидными" unless recur || train.valid?(true)
     end
@@ -38,13 +38,13 @@ class Station
   end
 
   def destroy
-    self.trains.each do |train| 
+    trains.each do |train| 
                         if train.route.nil?
-                          self.depart(train)
+                          depart(train)
                         else
                           train.move_up
                           train.move_down if train.station == self
-                          self.depart(train) if train.station == self
+                          depart(train) if train.station == self
                         end
                       end
     @@stations.delete(self)
@@ -56,20 +56,16 @@ class Station
   end
 
   def depart(old_train)
-    self.trains.delete(old_train)
+    trains.delete(old_train)
     old_train.set_station(nil) if old_train.station == self
   end
 
   def by_type(type)
-    self.trains.select {|t| t.type == type}
+    trains.select {|t| t.type == type}
   end
 
   def trains_info
-    self.trains.each { |train| yield(train) }
-  end
-
-  def each
-    self.trains.each { |train| yield(train) }
+    trains.each { |train| yield(train) }
   end
 
   private 
