@@ -1,6 +1,6 @@
-require_relative 'train.rb'
+require_relative 'train'
 class PassengerTrain < Train
   def type
-    :passenger 
+    :passenger
   end
 end

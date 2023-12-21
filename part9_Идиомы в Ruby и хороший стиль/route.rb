@@ -3,7 +3,7 @@ class Route
 
   def validate!
     stations.each do |station|
-      raise TypeError, 'Станция должна быть типа Station' unless station.kind_of? Station
+      raise TypeError, 'Станция должна быть типа Station' unless station.is_a? Station
       raise InvalidStation, 'Станции в маршруте должны быть валидные' unless station.valid?
     end
   end
@@ -11,7 +11,7 @@ class Route
   def valid?
     validate!
     true
-  rescue
+  rescue StandardError
     false
   end
 

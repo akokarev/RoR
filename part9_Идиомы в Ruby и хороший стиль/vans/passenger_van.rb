@@ -1,15 +1,16 @@
-require_relative 'van.rb'
-require_relative '../exceptions.rb'
+require_relative 'van'
+require_relative '../exceptions'
 class PassengerVan < Van
   attr_reader :seats
 
-  def type 
+  def type
     :passenger
   end
 
   def initialize(number, manufacturer = nil, seats_count)
-    raise ArgumentError, "Количество мест должно быть указано" if seats_count.nil?
-    @seats = {total: seats_count, used: 0 }
+    raise ArgumentError, 'Количество мест должно быть указано' if seats_count.nil?
+
+    @seats = { total: seats_count, used: 0 }
     super(number, manufacturer)
   end
 
@@ -26,10 +27,12 @@ class PassengerVan < Van
   end
 
   def take_seat
-    raise NotEnoughFreeSeats, 'Нет свободных мест' if free_seats == 0
-    self.seats[:used] += 1
+    raise NotEnoughFreeSeats, 'Нет свободных мест' if free_seats.zero?
+
+    seats[:used] += 1
   end
 
   private
+
   attr_writer :seats
 end

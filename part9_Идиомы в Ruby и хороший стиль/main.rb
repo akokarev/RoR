@@ -1,47 +1,48 @@
-require_relative 'station.rb'
-require_relative 'route.rb'
-require_relative 'trains/train.rb'
-require_relative 'trains/cargo_train.rb'
-require_relative 'trains/passenger_train.rb'
-require_relative 'vans/van.rb'
-require_relative 'vans/cargo_van.rb'
-require_relative 'vans/passenger_van.rb'
-require_relative 'exceptions.rb'
+require_relative 'station'
+require_relative 'route'
+require_relative 'trains/train'
+require_relative 'trains/cargo_train'
+require_relative 'trains/passenger_train'
+require_relative 'vans/van'
+require_relative 'vans/cargo_van'
+require_relative 'vans/passenger_van'
+require_relative 'exceptions'
 
+# Класс для работы консольным меню
 class MainCLI
   attr_accessor :vans, :routes
 
-  ERROR_WRONG_COMMAND = "\033[0;31mНеверная команда!\033[0m Смотрите справку: \033[0;32mhelp\033[0m"
-  ERROR_WRONG_TYPE = "\033[0;31mНеверный тип!\033[0m Допустимые типы: \033[0;32mcargo passenger\033[0m"
-  ERROR_WRONG_STATION = "\033[0;31mСтанция не найдена!\033[0m"
-  ERROR_WRONG_TRAIN = "\033[0;31mПоезд не найден!\033[0m"
-  ERROR_WRONG_VAN = "\033[0;31mВагон не найден!\033[0m"
-  ERROR_WRONG_VAN_TYPE = "\033[0;31mНеизвестный тип вагона!\033[0m"
-  PROMT = "\033[0;32m> "
-  PROMT_END = "\033[0m"
+  ERROR_WRONG_COMMAND = "\033[0;31mНеверная команда!\033[0m Смотрите справку: \033[0;32mhelp\033[0m".freeze
+  ERROR_WRONG_TYPE = "\033[0;31mНеверный тип!\033[0m Допустимые типы: \033[0;32mcargo passenger\033[0m".freeze
+  ERROR_WRONG_STATION = "\033[0;31mСтанция не найдена!\033[0m".freeze
+  ERROR_WRONG_TRAIN = "\033[0;31mПоезд не найден!\033[0m".freeze
+  ERROR_WRONG_VAN = "\033[0;31mВагон не найден!\033[0m".freeze
+  ERROR_WRONG_VAN_TYPE = "\033[0;31mНеизвестный тип вагона!\033[0m".freeze
+  PROMT = "\033[0;32m> ".freeze
+  PROMT_END = "\033[0m".freeze
 
   def initialize
     @vans = []
     @routes = []
   end
 
-  def ask(question, default_answer=nil)
+  def ask(question, default_answer = nil)
     print(question)
     answer = gets.chomp.to_s
     answer.empty? ? default_answer : answer
   end
 
-  def ask_i(question, default_answer='0')
+  def ask_i(question, default_answer = '0')
     ask(question, default_answer).to_i
   end
 
-  #Цветной вывод https://stackoverflow.com/questions/1489183/how-can-i-use-ruby-to-colorize-the-text-output-to-a-terminal
-  COLORS = {:default => "38", :black => "30", :red => "31", :green => "32", :brown => "33", :blue => "34", :purple => "35",
-    :cyan => "36", :gray => "37", :dark_gray => "1;30", :light_red => "1;31", :light_green => "1;32", :yellow => "1;33",
-    :light_blue => "1;34", :light_purple => "1;35", :light_cyan => "1;36", :white => "1;37"}
-  BG_COLORS = {:default => "0", :black => "40", :red => "41", :green => "42", :brown => "43", :blue => "44",
-    :purple => "45", :cyan => "46", :gray => "47", :dark_gray => "100", :light_red => "101", :light_green => "102",
-    :yellow => "103", :light_blue => "104", :light_purple => "105", :light_cyan => "106", :white => "107"}
+  # Цветной вывод https://stackoverflow.com/questions/1489183/how-can-i-use-ruby-to-colorize-the-text-output-to-a-terminal
+  COLORS = { default: '38', black: '30', red: '31', green: '32', brown: '33', blue: '34', purple: '35',
+             cyan: '36', gray: '37', dark_gray: '1;30', light_red: '1;31', light_green: '1;32', yellow: '1;33',
+             light_blue: '1;34', light_purple: '1;35', light_cyan: '1;36', white: '1;37' }.freeze
+  BG_COLORS = { default: '0', black: '40', red: '41', green: '42', brown: '43', blue: '44',
+                purple: '45', cyan: '46', gray: '47', dark_gray: '100', light_red: '101', light_green: '102',
+                yellow: '103', light_blue: '104', light_purple: '105', light_cyan: '106', white: '107' }.freeze
 
   def colorize(text, color = :default, bgColor = :default)
     color_code = COLORS[color]
@@ -56,11 +57,11 @@ class MainCLI
   def col_param(str)
     colorize(str, :light_red)
   end
-  
+
   def col_title(str)
     colorize(str, :cyan)
   end
-  
+
   def col_subtitle(str)
     colorize(str, :default, :dark_gray)
   end
@@ -68,18 +69,17 @@ class MainCLI
   def col_count(str)
     colorize(str, :purple)
   end
-  
+
   def col_comment(str)
     colorize(str, :default)
   end
-  
+
   def col_error(str)
-      colorize(str, :red)
+    colorize(str, :red)
   end
 
-
-  #ACTIONS
-  def show_help 
+  # ACTIONS
+  def show_help
     puts
     puts col_title '=== Управление железной дорогой ==='
     puts "#{col_subtitle 'Станции'} #{col_count "(#{Station.instances})"}"
@@ -113,27 +113,27 @@ class MainCLI
     puts "  #{col_command 'delete route'} #{col_param '<#number>'}                                  #{col_comment 'Удалить маршрут'}"
     puts "  #{col_command 'route'} #{col_param '<#number>'} #{col_command 'add'} #{col_param '<station>'}                           #{col_comment 'Добавить станцию'}"
     puts
-    puts "  #{col_command 'fill'}                                                   #{col_comment 'Добавить тестовые данные'}" 
-    puts "  #{col_command 'show all'}                                               #{col_comment 'Показать все станции и поезда на них'}" 
+    puts "  #{col_command 'fill'}                                                   #{col_comment 'Добавить тестовые данные'}"
+    puts "  #{col_command 'show all'}                                               #{col_comment 'Показать все станции и поезда на них'}"
     puts "  #{col_command 'help'}    #{col_comment 'Показать справку по командам'}"
     puts "  #{col_command 'exit'}    #{col_comment 'Выход'}"
   end
 
   def represent_train(train)
-    train.nil?? '<не указан>' : "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{represent_station(train.station)}, маршрут #{represent_route(train.route)}"
+    train.nil? ? '<не указан>' : "Поезд \##{train.number} (#{train.type}) by #{train.manufacturer}: скорость #{train.speed}км/ч, вагонов #{train.vans.count}, станция #{represent_station(train.station)}, маршрут #{represent_route(train.route)}"
   end
 
   def represent_train_simple(train)
-    train.nil?? 'не указан' : "\##{train.number} #{train.type} #{train.vans.count}"
+    train.nil? ? 'не указан' : "\##{train.number} #{train.type} #{train.vans.count}"
   end
 
   def represent_van(van)
     str = "Вагон #{van.number} #{van.type} by #{van.manufacturer} #{van.train.nil? ? 'отцеплен' : van.train.number}"
     case van.type
     when :cargo
-      str += " объем (#{van.volume[:used]}/#{van.volume[:total]})"
+      str + " объем (#{van.volume[:used]}/#{van.volume[:total]})"
     when :passenger
-      str += " мест (#{van.seats[:used]}/#{van.seats[:total]})"
+      str + " мест (#{van.seats[:used]}/#{van.seats[:total]})"
     end
   end
 
@@ -141,28 +141,28 @@ class MainCLI
     str = "#{van.number} #{van.type}"
     case van.type
     when :cargo
-      str += " #{van.volume[:used]}/#{van.volume[:total]}"
+      str + " #{van.volume[:used]}/#{van.volume[:total]}"
     when :passenger
-      str += " #{van.seats[:used]}/#{van.seats[:total]}"
+      str + " #{van.seats[:used]}/#{van.seats[:total]}"
     end
   end
 
   def represent_station(station)
-    station.nil?? '<в пути>' : station.name
+    station.nil? ? '<в пути>' : station.name
   end
 
   def represent_route(route)
-    route.nil?? '<маршрут не назначен>' : "[#{route.stations.map{ |st| st.name }.join '-'}]"
+    route.nil? ? '<маршрут не назначен>' : "[#{route.stations.map(&:name).join '-'}]"
   end
 
   def new_train(number, type, manufacturer = nil)
-    case type 
+    case type
     when :cargo
       CargoTrain.new(number, manufacturer)
     when :passenger
       PassengerTrain.new(number, manufacturer)
     end
-    puts "\##{Train.all.count-1}: #{represent_train(Train.all.last)}"
+    puts "\##{Train.all.count - 1}: #{represent_train(Train.all.last)}"
   end
 
   def new_van(number, type, manufacturer = nil, total)
@@ -170,24 +170,28 @@ class MainCLI
     when :cargo then vans << CargoVan.new(number, manufacturer, total)
     when :passenger then vans << PassengerVan.new(number, manufacturer, total)
     end
-    puts "\##{vans.count-1}: #{represent_van(vans.last)}"
+    puts "\##{vans.count - 1}: #{represent_van(vans.last)}"
   end
 
   def new_route(stations_names)
-    station_a = Station.all.select{ |station| station.name == stations_names.first}.first
-    station_b = Station.all.select{ |station| station.name == stations_names.last}.first
+    station_a = Station.all.select { |station| station.name == stations_names.first }.first
+    station_b = Station.all.select { |station| station.name == stations_names.last }.first
     route = Route.new(station_a, station_b)
     if stations_names.count > 2
-      stations_names[1..-2].each { |st_name| route.add(Station.all.select{ |station| station.name == st_name }.first) }   
+      stations_names[1..-2].each do |st_name|
+        route.add(Station.all.select do |station|
+                    station.name == st_name
+                  end.first)
+      end
     end
     routes << route
-    puts "\##{routes.count-1}: #{represent_route(routes.last)}"    
+    puts "\##{routes.count - 1}: #{represent_route(routes.last)}"
   end
 
   def show_station(name)
-    station = Station.all.select{ |station| station.name==name}.first
+    station = Station.all.select { |station| station.name == name }.first
     puts "=#{represent_station(station)}="
-    station.trains.each { |train| puts represent_train(train)}
+    station.trains.each { |train| puts represent_train(train) }
   end
 
   def show_train(number)
@@ -201,17 +205,16 @@ class MainCLI
   end
 
   def show_van(number)
-    van = vans.select{| van| van.number==number}.first
+    van = vans.select { |van| van.number == number }.first
     puts represent_van(van)
   end
 
-
-  #MENU
+  # MENU
   def menu_new_station(choice_arr)
     if choice_arr.count >= 1
-      station_name=choice_arr.join(' ')
+      station_name = choice_arr.join(' ')
       station = Station.new(station_name)
-      puts "\##{Station.all.count-1}: #{represent_station(station)}"
+      puts "\##{Station.all.count - 1}: #{represent_station(station)}"
     else
       puts ERROR_WRONG_COMMAND
     end
@@ -221,12 +224,12 @@ class MainCLI
     if choice_arr.count >= 2
       type_str = choice_arr.shift.upcase
       number = choice_arr.shift
-      manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
+      manufacturer = choice_arr.count.positive? ? choice_arr.join(' ') : nil
 
       case type_str
-      when 'C','CARGO'
+      when 'C', 'CARGO'
         type = :cargo
-      when 'P', 'PASSENGER' 
+      when 'P', 'PASSENGER'
         type = :passenger
       else
         puts ERROR_WRONG_TYPE
@@ -244,12 +247,12 @@ class MainCLI
       type_str = choice_arr.shift.upcase
       number = choice_arr.shift.to_i
       total = choice_arr.pop.to_i
-      manufacturer = (choice_arr.count > 0) ? choice_arr.join(' ') : nil
+      manufacturer = choice_arr.count.positive? ? choice_arr.join(' ') : nil
 
       case type_str
-      when 'C','CARGO'
+      when 'C', 'CARGO'
         type = :cargo
-      when 'P', 'PASSENGER' 
+      when 'P', 'PASSENGER'
         type = :passenger
       else
         puts ERROR_WRONG_TYPE
@@ -263,7 +266,7 @@ class MainCLI
   end
 
   def menu_new_route(choice_arr)
-    if choice_arr.count >=1
+    if choice_arr.count >= 1
       new_route(choice_arr.join(' ').split(';'))
     else
       puts ERROR_WRONG_COMMAND
@@ -274,7 +277,7 @@ class MainCLI
     choice_current = choice_arr.shift.upcase
     case choice_current
     when 'S', 'STATION'
-     menu_new_station(choice_arr)
+      menu_new_station(choice_arr)
     when 'T', 'TRAIN'
       menu_new_train(choice_arr)
     when 'V', 'VAN'
@@ -283,7 +286,7 @@ class MainCLI
       menu_new_route(choice_arr)
     else
       puts ERROR_WRONG_COMMAND
-    end 
+    end
   end
 
   def show_all
@@ -319,11 +322,11 @@ class MainCLI
   def menu_list(choice_arr)
     case choice_arr.first.upcase
     when 'S', 'STATIONS'
-      Station.all.each { |st| puts represent_station(st)}
+      Station.all.each { |st| puts represent_station(st) }
     when 'T', 'TRAINS'
-      Train.all.each { |tr| puts represent_train(tr)} 
+      Train.all.each { |tr| puts represent_train(tr) }
     when 'V', 'VANS'
-      vans.each { |vn| puts represent_van(vn)}
+      vans.each { |vn| puts represent_van(vn) }
     when 'R', 'ROUTES'
       routes.each_with_index { |rt, n| puts "#{n} #{represent_route(rt)}" }
     else
@@ -335,28 +338,28 @@ class MainCLI
     choice_current = choice_arr.shift.upcase
     case choice_current
     when 'S', 'STATION'
-      station = Station.all.select { |st| st.name==choice_arr.join(' ')}.first
+      station = Station.all.select { |st| st.name == choice_arr.join(' ') }.first
       station.destroy
-      #Код ниже должен быть после перемещения поезда. В будущем убрать внутрь destroy, после доработки класса Route.
-      routes.each do |route| 
-                    route.stations.delete(station)
-                    routes.delete(route) if route.stations.count == 0
-                  end
+      # Код ниже должен быть после перемещения поезда. В будущем убрать внутрь destroy, после доработки класса Route.
+      routes.each do |route|
+        route.stations.delete(station)
+        routes.delete(route) if route.stations.count.zero?
+      end
       puts 'Станция удалена'
     when 'T', 'TRAIN'
-      train = Train.all.select { |tr| tr.number==choice_arr.first.to_i}.first
-      train.vans.each { |van| van.unhook }
-      train.station.depart(train) if train.station
+      train = Train.all.select { |tr| tr.number == choice_arr.first.to_i }.first
+      train.vans.each(&:unhook)
+      train.station&.depart(train)
       train.destroy
       puts 'Поезд удален'
     when 'V', 'VAN'
-      van = vans.select { |van| van.number==choice_arr.first.to_i}.first
+      van = vans.select { |van| van.number == choice_arr.first.to_i }.first
       van.unhook if van.train
       vans.delete(van)
       puts 'Вагон удален'
     when 'R', 'ROUTE'
       route = routes[choice_arr.first.to_i]
-      Train.all.each { |train| train.set_route(nil) if train.route == route}
+      Train.all.each { |train| train.set_route(nil) if train.route == route }
       routes.delete(route)
       puts 'Маршрут удален'
     else
@@ -368,24 +371,24 @@ class MainCLI
     number = choice_arr.first.to_i
     van = vans.select { |vn| vn.number == number }.first
     train.hook(van)
-    puts "Вагон успешно прицеплен"
+    puts 'Вагон успешно прицеплен'
   end
 
   def menu_train_unhook(train, choice_arr)
     number = choice_arr.first.to_i
     van = vans.select { |vn| vn.number == number }.first
     train.unhook(van)
-    puts "Вагон успешно отцеплен"
+    puts 'Вагон успешно отцеплен'
   end
 
   def menu_train_move(train, choice_arr)
-    number = choice_arr.first.to_i
+    choice_arr.first.to_i
     direction = choice_arr.shift.upcase
     case direction
     when 'U', 'UP'
       train.move_up
       puts "Поезд №#{train.number} на станции #{represent_station(train.station)}"
-    when 'D', 'DOWN' 
+    when 'D', 'DOWN'
       train.move_down
       puts "Поезд №#{train.number} на станции #{represent_station(train.station)}"
     when 'S', 'STATION'
@@ -401,20 +404,22 @@ class MainCLI
   def menu_train_route(train, choice_arr)
     n = choice_arr.first.to_i
     train.set_route(routes[n])
-    puts "Поезду назначен на маршрут"
+    puts 'Поезду назначен на маршрут'
   end
 
   def menu_train_take(choice)
     number = choice.shift.to_i
     count = choice.shift.to_i
     van = vans.select { |van| van.number == number }.first
-    unless van.nil?
+    if van.nil?
+      puts ERROR_WRONG_VAN
+    else
       case van.type
       when :passenger
         taked = 0
-        used_before = van.used_seats
+        van.used_seats
         begin
-          count.times do 
+          count.times do
             van.take_seat
             taked += 1
           end
@@ -435,14 +440,12 @@ class MainCLI
       else
         puts ERROR_WRONG_VAN_TYPE
       end
-    else
-      puts ERROR_WRONG_VAN
     end
   end
 
   def menu_train(choice_arr)
     word = choice_arr.shift
-    case word.upcase 
+    case word.upcase
     when 'T', 'TAKE'
       menu_train_take(choice_arr)
     else
@@ -466,11 +469,11 @@ class MainCLI
         puts ERROR_WRONG_COMMAND
       end
     end
-  end  
+  end
 
   def menu_route_add(route, stations_names_str)
     stations_names = stations_names_str.split(';')
-    stations_names.each { |name| route.add(Station.all.select{|st| st.name == name}.first) }
+    stations_names.each { |name| route.add(Station.all.select { |st| st.name == name }.first) }
   end
 
   def menu_route(choice_arr)
@@ -478,7 +481,7 @@ class MainCLI
     route = routes[n]
     choice_current = choice_arr.shift.upcase
     case choice_current
-    when 'A', 'ADD'    
+    when 'A', 'ADD'
       menu_route_add(route, choice_arr.join(' '))
       puts represent_route(route)
     else
@@ -508,7 +511,7 @@ class MainCLI
     menu('train take 1102 20')
     menu('train take 1103 1')
     menu('train take 1104 2')
-    
+
     menu('new train passenger 102-FF Людиновский ТВСЗ')
     menu('new van passenger 1201 Метровагонмаш 40')
     menu('new van passenger 1202 Метровагонмаш 44')
@@ -518,7 +521,7 @@ class MainCLI
     menu('new van passenger 1206 Метровагонмаш 44')
     menu('new van passenger 1207 Метровагонмаш 44')
     menu('new van passenger 1208 Метровагонмаш 42')
-    
+
     menu('train 102-FF hook 1201')
     menu('train 102-FF hook 1202')
     menu('train 102-FF hook 1203')
@@ -537,7 +540,7 @@ class MainCLI
     menu('train 103 hook 1302')
     menu('train 103 hook 1303')
     menu('train 103 hook 1304')
-    
+
     menu('new train cargo 104 Коломенский завод')
     menu('new van cargo 1401 Канашский ВРЗ 80')
     menu('new van cargo 1402 Канашский ВРЗ 60')
@@ -545,20 +548,20 @@ class MainCLI
     menu('new van cargo 1404 Канашский ВРЗ 40')
     menu('new van cargo 1405 Канашский ВРЗ 40')
     menu('new van cargo 1406 Канашский ВРЗ 40')
-    
+
     menu('train 104 hook 1401')
     menu('train 104 hook 1402')
     menu('train 104 hook 1403')
     menu('train 104 hook 1404')
     menu('train 104 hook 1405')
     menu('train 104 hook 1406')
-    
+
     menu('new train cargo 105 Людиновский ТВСЗ')
     menu('new train passenger 106 Уралтрансмаш')
     menu('new train passenger 107 Уралтрансмаш')
     menu('new van cargo 1501 100')
     menu('new van passenger 1601 100')
-    
+
     menu('new station Москва')
     menu('new station Питер')
     menu('new station Ростов')
@@ -571,27 +574,27 @@ class MainCLI
     menu('new station Новокузнецк')
     menu('new station Челябинск')
     menu('new station Крымск')
-    
+
     menu('new route Москва;Ростов;Краснодар;Сочи;Адлер')
     menu('new route Москва;Питер')
     menu('new route Краснодар;Абинск;Крымск;Новороссийск')
     menu('new route Краснодар;Сочи;Адлер')
     menu('new route Челябинск;Новокузнецк;Краснодар;Сочи')
-    
+
     menu('train 101 route 0')
     menu('train 102-FF route 1')
     menu('train 103 route 2')
     menu('train 105 route 3')
     menu('train 106 route 4')
     menu('train 107 route 5')
-  
+
     3.times { menu('train 101 move up') }
     4.times { menu('train 102-FF move up') }
   end
 
   def menu(choice)
     choice_arr = choice.split(' ')
-    
+
     if choice_arr.count >= 1
       choice_current = choice_arr.shift.upcase
       case choice_current
@@ -611,30 +614,25 @@ class MainCLI
     false
   end
 
-  def start()
+  def start
     loop do
       choice = ask PROMT
       print PROMT_END
-      
-      unless choice.nil?
-        break if menu(choice)
-      end
+
+      break if !choice.nil? && menu(choice)
     end
   end
-
-end #class MainCLI
-
+end
 
 puts "Thinknetica: Управление ЖД\n(c)2023 Anton Kokarev\n\nВведите help для справки"
 menu = MainCLI.new
 
 normal_exit = false
-while !normal_exit do 
+until normal_exit
   begin
     menu.start
     normal_exit = true
-
-  rescue  StandardError => e
+  rescue StandardError => e
     puts e.inspect
     puts e.backtrace
     retry

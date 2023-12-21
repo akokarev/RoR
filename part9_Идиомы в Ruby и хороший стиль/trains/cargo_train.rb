@@ -1,4 +1,4 @@
-require_relative 'train.rb'
+require_relative 'train'
 class CargoTrain < Train
   def type
     :cargo

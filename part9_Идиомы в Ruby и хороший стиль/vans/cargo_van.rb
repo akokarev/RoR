@@ -1,15 +1,16 @@
-require_relative 'van.rb'
-require_relative '../exceptions.rb'
+require_relative 'van'
+require_relative '../exceptions'
 class CargoVan < Van
   attr_reader :volume
 
-  def type 
+  def type
     :cargo
-  end  
+  end
 
   def initialize(number, manufacturer = nil, volume_new)
-    raise ArgumentError, "Объем должен быть указан" if volume_new.nil?
-    @volume = {:total => volume_new, :used => 0 }
+    raise ArgumentError, 'Объем должен быть указан' if volume_new.nil?
+
+    @volume = { total: volume_new, used: 0 }
     super(number, manufacturer)
   end
 
@@ -27,9 +28,11 @@ class CargoVan < Van
 
   def take_volume(volume_add)
     raise NotEnoughFreeVolume, 'Нет свободного места' if free_volume <= volume_add
-    self.volume[:used] += volume_add
+
+    volume[:used] += volume_add
   end
 
   private
+
   attr_writer :volume
 end

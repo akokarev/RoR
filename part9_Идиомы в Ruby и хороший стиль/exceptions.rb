@@ -1,22 +1,20 @@
+DifferentTypes = Class.new(ArgumentError)
 
-class DifferentTypes < ArgumentError; end
+ValidateFail = Class.new(StandardError)
+WrongManufaturer = Class.new(StandardError)
 
-class ValidateFail < StandardError; end
-class WrongManufaturer < StandardError; end
+InvalidVan = Class.new(ValidateFail)
+NotEnoughFreeVolume = Class.new(InvalidVan)
+NotEnoughFreeSeats = Class.new(InvalidVan)
+VanDoubleHooked = Class.new(InvalidVan)
+VanNotHooked = Class.new(InvalidVan)
+WrongVanNumber = Class.new(InvalidVan)
 
+InvalidTrain = Class.new(ValidateFail)
+TrainMoving = Class.new(InvalidTrain)
+WrongTrainNumber = Class.new(InvalidTrain)
 
-class InvalidVan < ValidateFail; end
-class NotEnoughFreeVolume < InvalidVan; end
-class NotEnoughFreeSeats < InvalidVan; end
-class VanDoubleHooked < InvalidVan; end
-class VanNotHooked < InvalidVan; end
-class WrongVanNumber < InvalidVan; end
+InvalidStation = Class.new(ValidateFail)
+InvalidStationName = Class.new(InvalidStation)
 
-class InvalidTrain < ValidateFail; end
-class TrainMoving < InvalidTrain; end
-class WrongTrainNumber < InvalidTrain; end
-
-class InvalidStation < ValidateFail; end
-class InvalidStationName < InvalidStation; end
-
-class InvalidRoute < ValidateFail; end
+InvalidRoute = Class.new(ValidateFail)
