@@ -1,3 +1,4 @@
+# Класс маршрутов движения поездов
 class Route
   attr_reader :stations
 
@@ -20,7 +21,7 @@ class Route
     validate!
   end
 
-  def add(pos = -2, new_station)
+  def add(new_station, pos = -2)
     stations.insert(pos, new_station) if new_station
   end
 

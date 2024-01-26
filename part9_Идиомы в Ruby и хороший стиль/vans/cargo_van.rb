@@ -1,5 +1,6 @@
 require_relative 'van'
 require_relative '../exceptions'
+# Грузовой вагон
 class CargoVan < Van
   attr_reader :volume
 
@@ -7,7 +8,7 @@ class CargoVan < Van
     :cargo
   end
 
-  def initialize(number, manufacturer = nil, volume_new)
+  def initialize(number, volume_new, manufacturer = nil)
     raise ArgumentError, 'Объем должен быть указан' if volume_new.nil?
 
     @volume = { total: volume_new, used: 0 }

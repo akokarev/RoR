@@ -1,5 +1,6 @@
 require_relative 'van'
 require_relative '../exceptions'
+# Пассажирский вагон
 class PassengerVan < Van
   attr_reader :seats
 
@@ -7,7 +8,7 @@ class PassengerVan < Van
     :passenger
   end
 
-  def initialize(number, manufacturer = nil, seats_count)
+  def initialize(number, seats_count, manufacturer = nil)
     raise ArgumentError, 'Количество мест должно быть указано' if seats_count.nil?
 
     @seats = { total: seats_count, used: 0 }

@@ -1,2 +1,13 @@
+AllCops:
+  NewCops: enable
+
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Layout/LineLength:
+  Max: 4000
+Metrics/MethodLength:
+  Max: 2000
+
+Metrics/ClassLength:
+  Max: 2000

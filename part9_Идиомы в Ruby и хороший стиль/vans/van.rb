@@ -1,6 +1,7 @@
 require_relative '../trains/train'
 require_relative '../modules/manufacturer'
 require_relative '../exceptions'
+# Общий вагон, напрямую не используется и должен быть расширен
 class Van
   include Manufacturer
   attr_reader :number, :train
@@ -9,22 +10,22 @@ class Van
     raise NotImplementedError
   end
 
-  def validate_train!(train, recur = false)
+  def validate_train!(train, recur: false)
     return if train.nil?
     raise TypeError, 'Поезд должен быть наследником класса Train' unless train.is_a? Train
     raise DifferentTypes, 'Тип вагона не соответсвует типу поезда' unless type == train.type
     raise InvalidTrain, 'Поезд должен быть валидным' unless recur || train.valid?(true)
   end
 
-  def validate!(recur = false)
+  def validate!(recur: false)
     raise WrongVanNumber, 'Номер вагона целое число больше нуля' unless number.is_a?(Integer) && number.positive?
     raise WrongManufaturer, 'Производитель строка минимум 3 символа' if manufacturer !~ /\A[\p{Cyrillic} \w]{3,}\z/
 
     validate_train!(train, recur)
   end
 
-  def valid?(recur = false)
-    validate!(recur)
+  def valid?(recur: false)
+    validate!(recur: recur)
     true
   rescue StandardError
     false

@@ -1,3 +1,4 @@
+# Модуль добавляет счетчик сущностей
 module InstanceCounter
   def self.included(base)
     base.extend ClassMethods
@@ -5,6 +6,7 @@ module InstanceCounter
     base.send(:instances=, 0)
   end
 
+  # Методы класса
   module ClassMethods
     attr_reader :instances
 
@@ -13,6 +15,7 @@ module InstanceCounter
     attr_writer :instances
   end
 
+  # Методы сущности
   module InstanceMethods
     protected
 
