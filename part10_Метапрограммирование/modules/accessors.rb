@@ -1,4 +1,4 @@
-module Acсessors
+  module Acсessors
   def attr_accessor_with_history(*variables)
     variables.each do |variable|
       raise TypeError.new("variable name is not symbol") unless variable.is_a?(Symbol)
@@ -14,15 +14,20 @@ module Acсessors
       end
       
       define_method("#{variable}=") do |v|
-        instance_variable_get(var_history).push(v)
+        self.public_send(history).push(v)
       end
-
     end
   end
-end
 
-class Test
-  extend Acсessors
+  def strong_attr_accessor(variable, type)
+    define_method("#{variable}") do
+      instance_variable_get("@#{variable}")
+    end
 
-  attr_accessor_with_history :a, :b
+    define_method("#{variable}=") do |v|
+      raise TypeError, "Type of #{variable} is #{v.class}, but shuld be #{type}" unless v.kind_of?(type)
+      instance_variable_set("@#{variable}", v)
+    end
+
+  end
 end
